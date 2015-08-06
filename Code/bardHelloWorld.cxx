@@ -18,6 +18,7 @@
 #include <vtkPolyData.h>
 #include <cv.h>
 #include <aruco/boarddetector.h>
+#include <bardOpenCVVideoSource.h>
 
 int main()
 {
@@ -26,7 +27,14 @@ int main()
   vtkSmartPointer<vtkPolyData> somePolies = vtkSmartPointer<vtkPolyData>::New();
   cv::Matx44d someMatrix;
   aruco::Board someBoard;
+  bard::OpenCVVideoSource mySource("");
 
-  std::cout << "Hello World" << std::endl;
+  char a;
+  std::cin >> a;
+  mySource.DumpImage("/tmp/matt.jpg");
+  std::cin >> a;
+
+  std::cout << "Hello World, video is " << mySource.GetWidth() << " x " << mySource.GetHeight() << std::endl;
+
   return EXIT_SUCCESS;
 }

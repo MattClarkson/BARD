@@ -12,5 +12,11 @@
 #
 #============================================================================*/
 
-add_executable(bardHelloWorld bardHelloWorld.cxx)
+
+set(VIDEO_SRCS
+  bardVideoSourceInterface.cxx
+  bardOpenCVVideoSource.cxx
+)
+
+add_executable(bardHelloWorld bardHelloWorld.cxx ${VIDEO_SRCS})
 target_link_libraries(bardHelloWorld ${ALL_LIBS})

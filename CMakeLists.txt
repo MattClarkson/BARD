@@ -217,7 +217,7 @@ set(BARD_INSTALL_LIB_DIR "bin")
 # Set the main include path, just before generating BARDConfigure.
 #######################################################################
 include_directories(
-  ${BARD_INCLUDE_DIRS_BUILD_TREE}
+  ${CMAKE_SOURCE_DIR}/Code
   )
 
 ######################################################################
