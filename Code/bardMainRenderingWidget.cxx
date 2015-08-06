@@ -195,6 +195,20 @@ void MainRenderingWidget::SetImageCameraToFaceImage()
 
 
 //-----------------------------------------------------------------------------
+void MainRenderingWidget::SetImageOpacity(float zeroToOne)
+{
+  m_ImageActor->SetOpacity(zeroToOne);
+}
+
+
+//-----------------------------------------------------------------------------
+float MainRenderingWidget::GetImageOpacity() const
+{
+  return m_ImageActor->GetOpacity();
+}
+
+
+//-----------------------------------------------------------------------------
 void MainRenderingWidget::OnTimerTriggered()
 {
   if (m_VideoSource != NULL)

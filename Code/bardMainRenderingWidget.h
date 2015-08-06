@@ -42,6 +42,8 @@ public:
   void SetVideoSource(bard::VideoSourceInterface* source);
   void SetEnableImage(bool isEnabled);
   bool GetImageIsEnabled() const;
+  void SetImageOpacity(float zeroToOne);
+  float GetImageOpacity() const;
 
 private slots:
 

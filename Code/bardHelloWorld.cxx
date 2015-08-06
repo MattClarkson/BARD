@@ -28,6 +28,7 @@ int main(int argc, char** argv)
 
   bard::MainRenderingWidget myWidget;
   myWidget.SetVideoSource(&mySource);
+  myWidget.SetImageOpacity(0.5);
 
   bard::MainWindow mainWin;
   mainWin.SetMainRenderingWidget(&myWidget);
