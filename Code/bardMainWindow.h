@@ -22,6 +22,9 @@ namespace bard
 
 class MainRenderingWidget;
 
+/**
+ * \class MainWindow
+ */
 class MainWindow : public QMainWindow, public Ui::BARDMainWindow {
 
   Q_OBJECT

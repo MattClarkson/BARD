@@ -15,6 +15,7 @@
 set(VIDEO_SRCS
   bardVideoSourceInterface.cxx
   bardOpenCVVideoSource.cxx
+  bardCalibratedCamera.cxx
 )
 
 SET(QT_SOURCES_CPP

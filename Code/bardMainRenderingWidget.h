@@ -20,12 +20,17 @@
 #include <vtkImageImport.h>
 #include <vtkImageActor.h>
 #include <vtkRenderer.h>
+#include "bardCalibratedCamera.h"
 
 namespace bard
 {
 
 class VideoSourceInterface;
 
+/**
+ * \class MainRenderingWidget
+ * \brief Qt widget to hold a VTK rendered scene.
+ */
 class MainRenderingWidget : public QVTKWidget {
 
   Q_OBJECT
@@ -44,15 +49,21 @@ private slots:
 
 private:
 
-  QTimer                         *m_Timer;
-
   void SetImageArray(unsigned char* data, int width, int height);
-  bard::VideoSourceInterface     *m_VideoSource;
+  void SetImageCameraToFaceImage();
+
+  QTimer                           *m_Timer;
+
+
+  bard::VideoSourceInterface       *m_VideoSource;
 
   // For placing an image in the foreground/background.
-  vtkSmartPointer<vtkImageImport> m_ImageImporter;
-  vtkSmartPointer<vtkImageActor>  m_ImageActor;
-  vtkSmartPointer<vtkRenderer>    m_Renderer;
+  vtkSmartPointer<vtkImageImport>   m_ImageImporter;
+  vtkSmartPointer<vtkImageActor>    m_ImageActor;
+  vtkSmartPointer<vtkRenderer>      m_Renderer;
+
+  // For providing a difference camera to correctly render to calibrated intrinsic params.
+  vtkSmartPointer<CalibratedCamera> m_CalibratedCamera;
 };
 
 } // end namespace

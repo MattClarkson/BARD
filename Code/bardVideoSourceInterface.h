@@ -20,10 +20,9 @@ namespace bard {
  * \class VideoSourceInterface
  * \brief Abstract class defining a bare-bones video source.
  *
- * Implementors must implement RAII.
- * All errors must be thrown as subclasses of std::runtime_exception.
+ * Implementors must implement RAII, so all errors must be thrown as subclasses of std::runtime_exception.
  *
- * Images must be delivered as RGBA (like OpenCV).
+ * Images must be delivered as RGB, as that is what VTK pipeline expects.
  */
 class VideoSourceInterface
 {
