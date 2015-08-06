@@ -38,6 +38,10 @@ public:
 
 private:
 
+  float m_MinSize;
+  float m_MaxSize;
+  int m_BlockSize;
+  int m_Offset;
 };
 
 } // end namespace

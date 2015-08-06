@@ -22,9 +22,11 @@ namespace bard {
  * \class VideoSourceInterface
  * \brief Abstract class defining a bare-bones video source.
  *
- * Implementors must implement RAII, so all errors must be thrown as subclasses of std::runtime_exception.
+ * Implementors must implement RAII, and all errors must be thrown as subclasses of std::runtime_exception.
  *
- * Images must be delivered as RGB, as that is what VTK pipeline expects.
+ * Note the two methods ExposeImage() and ExposeOpenCVImage(). This exposes
+ * a raw pointer to internal images. Its up to sub-classes to decide whether
+ * to clone or not to protect themselves. Either way, these points are READ only.
  */
 class VideoSourceInterface
 {
@@ -33,18 +35,34 @@ public:
   VideoSourceInterface();
   virtual ~VideoSourceInterface();
 
-  bool GetFlipY();
+  bool GetFlipY() const;
   void SetFlipY(bool doFlip);
 
-  bool GetUndistort();
+  bool GetUndistort() const;
   void SetUndistort(bool doUndistort);
 
-  virtual bool GrabImage() = 0;
-  virtual int GetWidth() = 0;
-  virtual int GetHeight() = 0;
+  /**
+   * \brief Gets the image width in pixels.
+   */
+  virtual unsigned int GetWidth() = 0;
 
-  virtual unsigned char* ExposeImage() = 0;
-  virtual cv::Mat* ExposeOpenCVImage() = 0;
+  /**
+   * \brief Gets the image height in pixels.
+   */
+  virtual unsigned int GetHeight() = 0;
+
+  /**
+  * \brief Asks the video source to retrieve an image, either from a device, or from file.
+  *
+  * The image can then be read by reading from ExposeImage. or ExposeOpenCVImage.
+  */
+  virtual bool GrabImage() = 0;
+
+  /** Output must be in RGB format, with enough chars for 3 x width * height. */
+  virtual const unsigned char* const ExposeImage() = 0;
+
+  /** Output must be in BGR format, which I believe is normal OpenCV format. */
+  virtual const cv::Mat* const ExposeOpenCVImage() = 0;
 
 private:
 

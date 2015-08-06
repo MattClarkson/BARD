@@ -24,8 +24,7 @@ namespace bard
  * \class OpenCVVideoSource
  * \brief Implements a very basic interface to OpenCV's video source.
  *
- * Implements RAII, so all setup/init is in constructor, and all
- * tear-down is in destructor.
+ * Implements RAII, so all setup/init is in constructor, and all tear-down is in destructor.
  */
 class OpenCVVideoSource : public VideoSourceInterface {
 
@@ -34,12 +33,11 @@ public:
   OpenCVVideoSource(const std::string& fileName);
   virtual ~OpenCVVideoSource();
 
+  virtual unsigned int GetWidth();
+  virtual unsigned int GetHeight();
   virtual bool GrabImage();
-  virtual int GetWidth();
-  virtual int GetHeight();
-  virtual unsigned char* ExposeImage();
-  virtual cv::Mat* ExposeOpenCVImage();
-
+  virtual const unsigned char* const ExposeImage();
+  virtual const cv::Mat* const ExposeOpenCVImage();
   void DumpImage(const std::string& fileName);
 
 private:

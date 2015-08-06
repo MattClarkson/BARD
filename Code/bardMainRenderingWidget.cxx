@@ -71,7 +71,7 @@ void MainRenderingWidget::SetTagProcessor(bard::TagProcessingInterface* processo
 void MainRenderingWidget::SetVideoSource(bard::VideoSourceInterface* source)
 {
   m_VideoSource = source;
-  m_ImageImporter->SetImportVoidPointer(source->ExposeImage());
+  m_ImageImporter->SetImportVoidPointer(const_cast<unsigned char*>(source->ExposeImage()));
   m_ImageImporter->SetWholeExtent(1, source->GetWidth(), 1, source->GetHeight(), 1, 1);
   m_ImageImporter->SetDataExtentToWholeExtent();
   m_ImageImporter->Update();

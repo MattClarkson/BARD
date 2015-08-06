@@ -29,7 +29,7 @@ VideoSourceInterface::~VideoSourceInterface()
 
 
 //-----------------------------------------------------------------------------
-bool VideoSourceInterface::GetFlipY()
+bool VideoSourceInterface::GetFlipY() const
 {
   return m_FlipY;
 }
@@ -43,7 +43,7 @@ void VideoSourceInterface::SetFlipY(bool doFlip)
 
 
 //-----------------------------------------------------------------------------
-bool VideoSourceInterface::GetUndistort()
+bool VideoSourceInterface::GetUndistort() const
 {
   return m_Undistort;
 }

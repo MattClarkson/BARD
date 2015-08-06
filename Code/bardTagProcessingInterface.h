@@ -19,12 +19,20 @@
 namespace bard
 {
 
+/**
+ * \class TagProcessingInterface
+ * \brief Abstract class for any type of Tag processor.
+ */
 class TagProcessingInterface {
 
 public:
+
   TagProcessingInterface();
   virtual ~TagProcessingInterface();
 
+  /**
+  * \brief Reads the supplied video image, and extract tag ID and position information.
+  */
   virtual std::vector<TagData> GetTags(const cv::Mat& image) const = 0;
 };
 

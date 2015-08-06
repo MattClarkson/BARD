@@ -86,30 +86,30 @@ bool OpenCVVideoSource::GrabImage()
 
 
 //-----------------------------------------------------------------------------
-unsigned char* OpenCVVideoSource::ExposeImage()
+const unsigned char* const OpenCVVideoSource::ExposeImage()
 {
   return m_CurrentFrameInRGB.data;
 }
 
 
 //-----------------------------------------------------------------------------
-cv::Mat* OpenCVVideoSource::ExposeOpenCVImage()
+const cv::Mat* const OpenCVVideoSource::ExposeOpenCVImage()
 {
   return &m_CurrentFrameInBGR;
 }
 
 
 //-----------------------------------------------------------------------------
-int OpenCVVideoSource::GetWidth()
+unsigned int OpenCVVideoSource::GetWidth()
 {
-  return static_cast<int>(m_VideoCapture->get(CV_CAP_PROP_FRAME_WIDTH));
+  return static_cast<unsigned int>(m_VideoCapture->get(CV_CAP_PROP_FRAME_WIDTH));
 }
 
 
 //-----------------------------------------------------------------------------
-int OpenCVVideoSource::GetHeight()
+unsigned int OpenCVVideoSource::GetHeight()
 {
-  return static_cast<int>(m_VideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT));
+  return static_cast<unsigned int>(m_VideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT));
 }
 
 
