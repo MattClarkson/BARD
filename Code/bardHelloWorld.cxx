@@ -12,29 +12,28 @@
 
 ============================================================================*/
 
-#include <iostream>
-#include <cstdlib>
-#include <vtkSmartPointer.h>
-#include <vtkPolyData.h>
-#include <cv.h>
-#include <aruco/boarddetector.h>
+#include <QApplication>
+
 #include <bardOpenCVVideoSource.h>
+#include <bardMainWindow.h>
+#include <bardMainRenderingWidget.h>
 
-int main()
+int main(int argc, char** argv)
 {
-  // Its a "Hello World" to test include and library paths are set.
+  QApplication app(argc, argv);
+  app.setOrganizationName("CMIC");
+  app.setApplicationName("BARD");
 
-  vtkSmartPointer<vtkPolyData> somePolies = vtkSmartPointer<vtkPolyData>::New();
-  cv::Matx44d someMatrix;
-  aruco::Board someBoard;
   bard::OpenCVVideoSource mySource("");
 
-  char a;
-  std::cin >> a;
-  mySource.DumpImage("/tmp/matt.jpg");
-  std::cin >> a;
+  bard::MainRenderingWidget myWidget;
+  myWidget.SetVideoSource(&mySource);
 
-  std::cout << "Hello World, video is " << mySource.GetWidth() << " x " << mySource.GetHeight() << std::endl;
+  bard::MainWindow mainWin;
+  mainWin.SetMainRenderingWidget(&myWidget);
+  mainWin.show();
 
-  return EXIT_SUCCESS;
+  myWidget.SetEnableImage(true);
+
+  return app.exec();
 }

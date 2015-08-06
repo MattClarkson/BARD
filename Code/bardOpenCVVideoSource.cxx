@@ -14,6 +14,8 @@
 
 #include "bardOpenCVVideoSource.h"
 #include <stdexcept>
+#include <iostream>
+#include <cv.h>
 
 namespace bard
 {
@@ -41,6 +43,12 @@ OpenCVVideoSource::OpenCVVideoSource(const std::string& fileName)
   }
 
   m_FileName = fileName;
+
+  // Grab at least one frame, so image is initialised.
+  if (!this->GrabImage())
+  {
+    throw std::runtime_error("Failed to grab first frame.");
+  }
 }
 
 
@@ -66,10 +74,12 @@ bool OpenCVVideoSource::GrabImage()
     return false;
   }
 
-  if (!m_VideoCapture->retrieve(m_CurrentFrame))
+  if (!m_VideoCapture->retrieve(m_CurrentFrameInBGR))
   {
     throw std::runtime_error("Failed to retrieve recently grabbed image.");
   }
+
+  cvtColor(m_CurrentFrameInBGR, m_CurrentFrameInRGB, CV_BGR2RGB);
 
   return true;
 }
@@ -78,7 +88,7 @@ bool OpenCVVideoSource::GrabImage()
 //-----------------------------------------------------------------------------
 unsigned char* OpenCVVideoSource::ExposeImage()
 {
-  return m_CurrentFrame.data;
+  return m_CurrentFrameInRGB.data;
 }
 
 
@@ -103,7 +113,7 @@ void OpenCVVideoSource::DumpImage(const std::string& fileName)
   {
     throw std::runtime_error("Failed to grab image.");
   }
-  if (!cv::imwrite(fileName, m_CurrentFrame))
+  if (!cv::imwrite(fileName, m_CurrentFrameInBGR))
   {
     throw std::runtime_error("Failed to write file.");
   }

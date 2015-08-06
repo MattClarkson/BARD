@@ -11,6 +11,8 @@
   See LICENSE.txt in the top level directory for details.
 
 ============================================================================*/
+#ifndef bardVideoSourceInterface_h
+#define bardVideoSourceInterface_h
 
 namespace bard {
 
@@ -53,3 +55,5 @@ private:
 };
 
 } // end namespace
+
+#endif

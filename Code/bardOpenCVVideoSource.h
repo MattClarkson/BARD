@@ -11,6 +11,8 @@
   See LICENSE.txt in the top level directory for details.
 
 ============================================================================*/
+#ifndef bardOpenCVVideoSource_h
+#define bardOpenCVVideoSource_h
 
 #include "bardVideoSourceInterface.h"
 #include <highgui.h>
@@ -43,7 +45,10 @@ private:
 
   cv::VideoCapture *m_VideoCapture;
   std::string       m_FileName; // if empty, we are grabbing from default device.
-  cv::Mat           m_CurrentFrame;
+  cv::Mat           m_CurrentFrameInBGR;
+  cv::Mat           m_CurrentFrameInRGB;
 };
 
 } // end namespace
+
+#endif
