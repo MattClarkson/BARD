@@ -11,7 +11,6 @@
   See LICENSE.txt in the top level directory for details.
 
 ============================================================================*/
-
 #ifndef bardCalibratedCamera_h
 #define bardCalibratedCamera_h
 
@@ -59,7 +58,7 @@ public:
   void SetCalibratedImageSize(const int& width, const int& height, double pixelaspect = 1.0);
 
   /**
-   * \brief Set the window/widget size currently used.
+   * \brief Set the window/widget size currently used, (i.e. that the window is currently displaying at).
    * \param width in pixels.
    * \param height in pixels.
    */

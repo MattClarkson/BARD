@@ -11,12 +11,12 @@
   See LICENSE.txt in the top level directory for details.
 
 ============================================================================*/
+#include "bardMainRenderingWidget.h"
+#include "bardVideoSourceInterface.h"
+#include "bardOpenCVVideoSource.h"
 
-#include <bardMainRenderingWidget.h>
 #include <vtkRenderWindow.h>
 #include <vtkImageData.h>
-#include <bardVideoSourceInterface.h>
-#include <bardOpenCVVideoSource.h>
 
 namespace bard
 {
@@ -27,6 +27,7 @@ MainRenderingWidget::MainRenderingWidget()
 , m_ImageImporter(NULL)
 , m_ImageActor(NULL)
 , m_Renderer(NULL)
+, m_TagProcessor(NULL)
 {
   m_Timer = new QTimer();
   m_Timer->setInterval(40);
@@ -60,18 +61,18 @@ MainRenderingWidget::~MainRenderingWidget()
 
 
 //-----------------------------------------------------------------------------
-void MainRenderingWidget::SetVideoSource(bard::VideoSourceInterface* source)
+void MainRenderingWidget::SetTagProcessor(bard::TagProcessingInterface* processor)
 {
-  m_VideoSource = source;
-  this->SetImageArray(source->ExposeImage(), source->GetWidth(), source->GetHeight());
+  m_TagProcessor = processor;
 }
 
 
 //-----------------------------------------------------------------------------
-void MainRenderingWidget::SetImageArray(unsigned char* data, int width, int height)
+void MainRenderingWidget::SetVideoSource(bard::VideoSourceInterface* source)
 {
-  m_ImageImporter->SetImportVoidPointer(data);
-  m_ImageImporter->SetWholeExtent(1, width, 1, height, 1, 1);
+  m_VideoSource = source;
+  m_ImageImporter->SetImportVoidPointer(source->ExposeImage());
+  m_ImageImporter->SetWholeExtent(1, source->GetWidth(), 1, source->GetHeight(), 1, 1);
   m_ImageImporter->SetDataExtentToWholeExtent();
   m_ImageImporter->Update();
 }
@@ -215,6 +216,11 @@ void MainRenderingWidget::OnTimerTriggered()
   {
     if(m_VideoSource->GrabImage())
     {
+
+      if (m_TagProcessor != NULL)
+      {
+        std::vector<TagData> tags = m_TagProcessor->GetTags(*(m_VideoSource->ExposeOpenCVImage()));
+      }
       m_ImageImporter->Modified();
       m_ImageImporter->Update(); // this is what pulls a new image in.
 
@@ -222,6 +228,13 @@ void MainRenderingWidget::OnTimerTriggered()
       this->GetRenderWindow()->Render();
     }
   }
+}
+
+
+//-----------------------------------------------------------------------------
+void MainRenderingWidget::SetWorldToCameraTransform(const vtkMatrix4x4& matrix)
+{
+
 }
 
 } // end namespace

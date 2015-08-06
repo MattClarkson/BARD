@@ -11,38 +11,20 @@
   See LICENSE.txt in the top level directory for details.
 
 ============================================================================*/
-#include "bardMainWindow.h"
-#include "bardMainRenderingWidget.h"
+#include "bardTagProcessingInterface.h"
 
 namespace bard
 {
 
 //-----------------------------------------------------------------------------
-MainWindow::MainWindow()
+TagProcessingInterface::TagProcessingInterface()
 {
 }
 
 
 //-----------------------------------------------------------------------------
-MainWindow::~MainWindow()
+TagProcessingInterface::~TagProcessingInterface()
 {
-
-}
-
-
-//-----------------------------------------------------------------------------
-void MainWindow::Start()
-{
-  m_RenderingWidget->GetInteractor()->Start();
-}
-
-
-//-----------------------------------------------------------------------------
-void MainWindow::SetMainRenderingWidget(MainRenderingWidget* widget)
-{
-  m_RenderingWidget = widget;
-  this->setCentralWidget(m_RenderingWidget);
 }
 
 } // end namespace
-

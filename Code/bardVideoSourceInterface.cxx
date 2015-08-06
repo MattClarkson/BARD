@@ -11,7 +11,6 @@
   See LICENSE.txt in the top level directory for details.
 
 ============================================================================*/
-
 #include "bardVideoSourceInterface.h"
 
 namespace bard

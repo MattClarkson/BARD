@@ -11,8 +11,8 @@
   See LICENSE.txt in the top level directory for details.
 
 ============================================================================*/
-
 #include "bardOpenCVVideoSource.h"
+
 #include <stdexcept>
 #include <iostream>
 #include <cv.h>
@@ -89,6 +89,13 @@ bool OpenCVVideoSource::GrabImage()
 unsigned char* OpenCVVideoSource::ExposeImage()
 {
   return m_CurrentFrameInRGB.data;
+}
+
+
+//-----------------------------------------------------------------------------
+cv::Mat* OpenCVVideoSource::ExposeOpenCVImage()
+{
+  return &m_CurrentFrameInBGR;
 }
 
 

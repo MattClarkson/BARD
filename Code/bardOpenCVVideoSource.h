@@ -38,6 +38,7 @@ public:
   virtual int GetWidth();
   virtual int GetHeight();
   virtual unsigned char* ExposeImage();
+  virtual cv::Mat* ExposeOpenCVImage();
 
   void DumpImage(const std::string& fileName);
 

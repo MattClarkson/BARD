@@ -11,38 +11,30 @@
   See LICENSE.txt in the top level directory for details.
 
 ============================================================================*/
-#include "bardMainWindow.h"
-#include "bardMainRenderingWidget.h"
+#include "bardArucoProcessor.h"
 
 namespace bard
 {
 
 //-----------------------------------------------------------------------------
-MainWindow::MainWindow()
-{
-}
-
-
-//-----------------------------------------------------------------------------
-MainWindow::~MainWindow()
+ArucoProcessor::ArucoProcessor()
 {
 
 }
 
 
 //-----------------------------------------------------------------------------
-void MainWindow::Start()
+ArucoProcessor::~ArucoProcessor()
 {
-  m_RenderingWidget->GetInteractor()->Start();
+
 }
 
 
 //-----------------------------------------------------------------------------
-void MainWindow::SetMainRenderingWidget(MainRenderingWidget* widget)
+std::vector<TagData> ArucoProcessor::GetTags(const cv::Mat& image) const
 {
-  m_RenderingWidget = widget;
-  this->setCentralWidget(m_RenderingWidget);
+  std::vector<TagData> results;
+  return results;
 }
 
 } // end namespace
-

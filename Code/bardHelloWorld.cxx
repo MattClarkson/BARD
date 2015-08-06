@@ -15,6 +15,7 @@
 #include <QApplication>
 
 #include <bardOpenCVVideoSource.h>
+#include <bardArucoProcessor.h>
 #include <bardMainWindow.h>
 #include <bardMainRenderingWidget.h>
 
@@ -25,8 +26,10 @@ int main(int argc, char** argv)
   app.setApplicationName("BARD");
 
   bard::OpenCVVideoSource mySource("");
+  bard::ArucoProcessor myProcessor;
 
   bard::MainRenderingWidget myWidget;
+  myWidget.SetTagProcessor(&myProcessor);
   myWidget.SetVideoSource(&mySource);
   myWidget.SetImageOpacity(0.5);
 

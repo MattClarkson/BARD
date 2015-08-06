@@ -14,6 +14,8 @@
 #ifndef bardVideoSourceInterface_h
 #define bardVideoSourceInterface_h
 
+#include <cv.h>
+
 namespace bard {
 
 /**
@@ -41,11 +43,8 @@ public:
   virtual int GetWidth() = 0;
   virtual int GetHeight() = 0;
 
-  /**
-  * Calling this 'ExposeImage' to highlight the fact that we
-  * are exposing the internal data array of the image.
-  */
   virtual unsigned char* ExposeImage() = 0;
+  virtual cv::Mat* ExposeOpenCVImage() = 0;
 
 private:
 
