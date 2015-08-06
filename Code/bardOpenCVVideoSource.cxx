@@ -13,6 +13,7 @@
 ============================================================================*/
 
 #include "bardOpenCVVideoSource.h"
+#include <stdexcept>
 
 namespace bard
 {
