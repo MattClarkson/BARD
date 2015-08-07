@@ -14,6 +14,8 @@
 
 #include <QApplication>
 #include <tclap/CmdLine.h>
+#include <cv.h>
+#include <iostream>
 
 #include <bardOpenCVVideoSource.h>
 #include <bardArucoProcessor.h>
@@ -28,15 +30,13 @@ int main(int argc, char** argv)
   try
   {
     TCLAP::CmdLine cmd("Basic Augmented Reality Demo", ' ', "0.1");
-    TCLAP::ValueArg<std::string> distortionArg("d","distortion","File containing (1x4) camera distortion coefficients.",false,"","string");
-    TCLAP::ValueArg<std::string> intrinsicsArg("i","intrinsics","File containing (3x3) camera intrinsics.",true,"","string");
+    TCLAP::ValueArg<std::string> intrinsicsArg("i","intrinsics","File containing (3x3) camera intrinsics then (1x4) distortion coefficients.",true,"","string");
     TCLAP::ValueArg<std::string> worldRefArg("w","world","File containing (nx4) points of a tracker board defining world coordinates.",true,"","string");
     TCLAP::ValueArg<std::string> pointerRefArg("p","pointer","File containing (nx4) points of a tracker board defining pointer coordinates.",false,"","string");
     TCLAP::ValueArg<std::string> modelArg("m","model","vtkPolyData file a model to be rendered in the scene.",false,"","string");
     TCLAP::ValueArg<float> imageOpacityArg("o","opacity","Image opacity.",false,0.5,"float");
     TCLAP::SwitchArg doDistortionArg("c","correct","Do distortion correction.", false);
     TCLAP::SwitchArg flipSwitchArg("f","flip","Flip in Y-axis.", false);
-    cmd.add( distortionArg );
     cmd.add( intrinsicsArg );
     cmd.add( worldRefArg );
     cmd.add( pointerRefArg );
@@ -45,7 +45,6 @@ int main(int argc, char** argv)
     cmd.add( doDistortionArg );
     cmd.add( flipSwitchArg );
     cmd.parse( argc, argv );
-    std::string distortionFile = distortionArg.getValue();
     std::string intrinsicsFile = intrinsicsArg.getValue();
     std::string worldRef = worldRefArg.getValue();
     std::string pointerRef = pointerRefArg.getValue();
@@ -71,6 +70,32 @@ int main(int argc, char** argv)
     myWidget.SetTagProcessor(&myProcessor);
     myWidget.SetRegistrationAlgorithm(&myRegistration);
     myWidget.SetImageOpacity(opacity);
+
+    cv::Matx33d intrinsicParameters;
+    cv::Matx14d distortionParameters;
+    if (intrinsicsFile.size() > 0)
+    {
+      std::ifstream ifs(intrinsicsFile);
+      if (!ifs.is_open())
+      {
+        throw std::runtime_error("Failed to open intrinsics file.");
+      }
+      for (int i = 0; i < 3; i++)
+      {
+        ifs >> intrinsicParameters(i, 0);
+        ifs >> intrinsicParameters(i, 1);
+        ifs >> intrinsicParameters(i, 2);
+      }
+      for (int i = 0; i < 4; i++)
+      {
+        ifs >> distortionParameters(0, i);
+      }
+      if (!ifs.good())
+      {
+        throw std::runtime_error("Failed to read intrinsics file.");
+      }
+      myWidget.SetCameraIntrinsics(intrinsicParameters);
+    }
 
     myWidget.AddTrackingModel(&myWorldTrackingModel);
     bard::TrackingModelData* pointerTrackingModel = NULL;
@@ -110,5 +135,9 @@ int main(int argc, char** argv)
   catch (TCLAP::ArgException &e)
   {
     std::cerr << "error: " << e.error() << " for arg " << e.argId() << std::endl;
+  }
+  catch (std::runtime_error& e)
+  {
+    std::cerr << "error: " << e.what() << std::endl;
   }
 }
