@@ -17,6 +17,8 @@
 
 #include <vtkRenderWindow.h>
 #include <vtkImageData.h>
+#include <sstream>
+#include <ostream>
 
 namespace bard
 {
@@ -80,6 +82,12 @@ MainRenderingWidget::MainRenderingWidget()
 
   m_CameraToWorldTransform = vtkSmartPointer<vtkMatrix4x4>::New();
   m_CameraToWorldTransform->Identity();
+
+#ifdef WIN32
+  m_PathSeparator = "\";
+#else
+  m_PathSeparator = "/";
+#endif
 }
 
 
@@ -454,6 +462,9 @@ void MainRenderingWidget::OnTimerTriggered()
               } // end for each point in chosen tracking model
             } // end if recording points of interest
           } // end for each non-reference tracking model
+
+          m_FrameCounter++;
+
         } // end if we have non-reference tracking models
       }
       m_ImageImporter->Modified();
@@ -490,14 +501,57 @@ vtkSmartPointer<vtkMatrix4x4> MainRenderingWidget::GetWorldToCameraTransform() c
 //-----------------------------------------------------------------------------
 void MainRenderingWidget::WriteMatrix(int i, vtkMatrix4x4& matrix)
 {
-  // ToDo: Write matrix to output directory
+  if (m_OutputDirectory.size() == 0)
+  {
+    throw std::runtime_error("Output directory is not specified");
+  }
+
+  std::stringstream oss;
+  oss << m_OutputDirectory << m_PathSeparator << "matrix." << i << "." << m_FrameCounter << ".txt";
+
+  std::ofstream ofs(oss.str());
+  if (!ofs.is_open())
+  {
+    std::stringstream errMsg;
+    errMsg << "Failed to open file " << oss.str() << " to write matrix." << std::endl;
+    throw std::runtime_error(errMsg.str());
+  }
+  for (int i = 0; i < 4; i++)
+  {
+    ofs << matrix.GetElement(i, 0) << " " << matrix.GetElement(i, 1) << " " << matrix.GetElement(i, 2) << " " << matrix.GetElement(i, 3) << std::endl;
+  }
+  ofs.close();
 }
 
 
 //-----------------------------------------------------------------------------
 void MainRenderingWidget::WritePoint(int i, vtkMatrix4x4& matrix, cv::Point3d& point)
 {
-  // ToDo: Write point to output directory
+  if (m_OutputDirectory.size() == 0)
+  {
+    throw std::runtime_error("Output directory is not specified");
+  }
+  std::stringstream oss;
+  oss << m_OutputDirectory << m_PathSeparator << "point." << i << "." << m_FrameCounter << ".txt";
+
+  std::ofstream ofs(oss.str());
+  if (!ofs.is_open())
+  {
+    std::stringstream errMsg;
+    errMsg << "Failed to open file " << oss.str() << " to write point." << std::endl;
+    throw std::runtime_error(errMsg.str());
+  }
+
+  double vtkPoint[4];
+  vtkPoint[0] = point.x;
+  vtkPoint[1] = point.y;
+  vtkPoint[2] = point.z;
+  vtkPoint[3] = 1;
+
+  matrix.MultiplyPoint(vtkPoint, vtkPoint);
+
+  ofs << vtkPoint[0] << " " << vtkPoint[1] << " " << vtkPoint[2] << std::endl;
+  ofs.close();
 }
 
 } // end namespace

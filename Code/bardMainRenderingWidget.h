@@ -122,6 +122,7 @@ private:
   bool                                 m_RecordMatrix;
   bool                                 m_RecordPointOfInterest;
   unsigned long int                    m_FrameCounter;
+  std::string                          m_PathSeparator;
 };
 
 } // end namespace
