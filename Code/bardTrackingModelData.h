@@ -34,6 +34,7 @@ namespace bard
 class TrackingModelData : public TrackingModelInterface {
 
 public:
+  TrackingModelData();
   TrackingModelData(const std::string& fileName);
   virtual ~TrackingModelData();
 

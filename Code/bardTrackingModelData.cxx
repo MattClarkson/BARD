@@ -78,6 +78,13 @@ TrackingModelData::TrackingModelData(const std::string& fileName)
 
 
 //-----------------------------------------------------------------------------
+TrackingModelData::TrackingModelData()
+{
+
+}
+
+
+//-----------------------------------------------------------------------------
 TrackingModelData::~TrackingModelData()
 {
 
