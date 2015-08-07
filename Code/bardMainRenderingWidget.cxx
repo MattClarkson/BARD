@@ -41,10 +41,6 @@ MainRenderingWidget::MainRenderingWidget()
 , m_FrameCounter(0)
 {
 
-  // ToDo: Set the image size used at calibration.
-  m_CalibratedImageSize.x = 640;
-  m_CalibratedImageSize.y = 480;
-
   m_Timer = new QTimer();
   m_Timer->setInterval(40);
   connect(m_Timer, SIGNAL(timeout()), this, SLOT(OnTimerTriggered()));
@@ -473,8 +469,7 @@ void MainRenderingWidget::OnTimerTriggered()
 //-----------------------------------------------------------------------------
 void MainRenderingWidget::SetWorldToCameraTransform(const vtkMatrix4x4& matrix)
 {
-  // ToDo: Set this when PnP algorithm is giving nice results.
-  // m_WorldToCameraTransform->DeepCopy(&matrix);
+  m_WorldToCameraTransform->DeepCopy(&matrix);
   m_CameraToWorldTransform->DeepCopy(m_WorldToCameraTransform);
   m_CameraToWorldTransform->Invert();
   m_CalibratedCamera->SetActualWindowSize(this->width(), this->height());

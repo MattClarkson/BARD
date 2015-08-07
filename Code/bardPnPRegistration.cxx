@@ -35,6 +35,7 @@ vtkSmartPointer<vtkMatrix4x4> PnPRegistration::DoRegistration(
       const std::vector<TagData>& tags)
 {
   vtkSmartPointer<vtkMatrix4x4> pose = vtkSmartPointer<vtkMatrix4x4>::New();
+  pose->Identity();
   return pose;
 }
 
