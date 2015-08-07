@@ -21,6 +21,7 @@
 #include <bardTrackingModelData.h>
 #include <bardMainWindow.h>
 #include <bardMainRenderingWidget.h>
+#include <bardVTKModelPipeline.h>
 
 int main(int argc, char** argv)
 {
@@ -31,6 +32,7 @@ int main(int argc, char** argv)
     TCLAP::ValueArg<std::string> intrinsicsArg("i","intrinsics","File containing (3x3) camera intrinsics.",true,"","string");
     TCLAP::ValueArg<std::string> worldRefArg("w","world","File containing (nx4) points of a tracker board defining world coordinates.",true,"","string");
     TCLAP::ValueArg<std::string> pointerRefArg("p","pointer","File containing (nx4) points of a tracker board defining pointer coordinates.",false,"","string");
+    TCLAP::ValueArg<std::string> modelArg("m","model","vtkPolyData file a model to be rendered in the scene.",false,"","string");
     TCLAP::ValueArg<float> imageOpacityArg("o","opacity","Image opacity.",false,0.5,"float");
     TCLAP::SwitchArg doDistortionArg("c","correct","Do distortion correction.", false);
     TCLAP::SwitchArg flipSwitchArg("f","flip","Flip in Y-axis.", false);
@@ -38,6 +40,7 @@ int main(int argc, char** argv)
     cmd.add( intrinsicsArg );
     cmd.add( worldRefArg );
     cmd.add( pointerRefArg );
+    cmd.add( modelArg );
     cmd.add( imageOpacityArg );
     cmd.add( doDistortionArg );
     cmd.add( flipSwitchArg );
@@ -46,6 +49,7 @@ int main(int argc, char** argv)
     std::string intrinsicsFile = intrinsicsArg.getValue();
     std::string worldRef = worldRefArg.getValue();
     std::string pointerRef = pointerRefArg.getValue();
+    std::string modelFile = modelArg.getValue();
     float opacity = imageOpacityArg.getValue();
     bool doDistortionCorrection = doDistortionArg.getValue();
     bool doFlipY = flipSwitchArg.getValue();
@@ -75,6 +79,12 @@ int main(int argc, char** argv)
       pointerTrackingModel = new bard::TrackingModelData(pointerRef);
       myWidget.AddTrackingModel(pointerTrackingModel);
     }
+    bard::VTKModelPipeline *modelForVisualisation = NULL;
+    if (modelFile.size() > 0)
+    {
+      modelForVisualisation = new bard::VTKModelPipeline(modelFile);
+      myWidget.AddVTKModel(modelForVisualisation);
+    }
 
     bard::MainWindow mainWin;
     mainWin.SetMainRenderingWidget(&myWidget);
@@ -82,6 +92,7 @@ int main(int argc, char** argv)
 
     myWidget.SetEnableImage(true);
     myWidget.SetEnableTrackingModels(true);
+    myWidget.SetEnableVTKModels(true);
 
     int status = app.exec();
 
@@ -89,6 +100,10 @@ int main(int argc, char** argv)
     if (pointerTrackingModel != NULL)
     {
       delete pointerTrackingModel;
+    }
+    if (modelForVisualisation != NULL)
+    {
+      delete modelForVisualisation;
     }
     return status;
   }
