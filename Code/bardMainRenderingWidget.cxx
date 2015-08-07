@@ -373,16 +373,17 @@ void MainRenderingWidget::OnTimerTriggered()
       if (m_TagProcessor != NULL)
       {
         std::vector<TagData> tags = m_TagProcessor->GetTags(*(m_VideoSource->ExposeOpenCVImage()));
-/*
+
+        // Assume that the first tracking model is for the camera coordinate system
         if (tags.size() > 0 &&
-            m_TagModel != NULL &&
-            m_TagModel->size() > 0 &&
+            m_TrackingModels.size() > 0 &&
+            m_TrackingModels[0] != NULL &&
             m_RegistrationAlgorithm != NULL)
         {
-          vtkSmartPointer<vtkMatrix4x4> matrix = m_RegistrationAlgorithm->DoRegistration(m_Intrinsics, *m_TagModel, tags);
+          vtkSmartPointer<vtkMatrix4x4> matrix = m_RegistrationAlgorithm->DoRegistration(m_Intrinsics, m_TrackingModels[0]->GetTrackingModel(), tags);
           this->SetWorldToCameraTransform(*matrix);
         }
-*/
+
       }
       m_ImageImporter->Modified();
       m_ImageImporter->Update(); // this is what pulls a new image in.
