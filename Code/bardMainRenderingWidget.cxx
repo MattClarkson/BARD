@@ -47,16 +47,21 @@ MainRenderingWidget::MainRenderingWidget()
   m_ImageActor = vtkSmartPointer<vtkImageActor>::New();
   m_ImageActor->SetInputData(m_ImageImporter->GetOutput());
 
+  this->GetRenderWindow()->SetNumberOfLayers(3);
+
   m_ImageRenderer = vtkSmartPointer<vtkRenderer>::New();
   m_ImageRenderer->InteractiveOff();
+  m_ImageRenderer->SetLayer(0);
   this->GetRenderWindow()->AddRenderer(m_ImageRenderer);
 
   m_VTKRenderer = vtkSmartPointer<vtkRenderer>::New();
   m_VTKRenderer->InteractiveOff();
+  m_VTKRenderer->SetLayer(1);
   this->GetRenderWindow()->AddRenderer(m_VTKRenderer);
 
   m_TrackingRenderer = vtkSmartPointer<vtkRenderer>::New();
   m_TrackingRenderer->InteractiveOff();
+  m_TrackingRenderer->SetLayer(2);
   this->GetRenderWindow()->AddRenderer(m_TrackingRenderer);
 
   m_CalibratedCamera = vtkSmartPointer<CalibratedCamera>::New();
@@ -108,6 +113,36 @@ void MainRenderingWidget::SetRegistrationAlgorithm(bard::RegistrationInterface* 
 
 
 //-----------------------------------------------------------------------------
+void MainRenderingWidget::UpdateLayers()
+{
+  if (m_VTKRenderer->GetActors()->GetNumberOfItems() == 0 && m_TrackingRenderer->GetActors()->GetNumberOfItems() == 0)
+  {
+    m_VTKRenderer->SetLayer(0);     // empty
+    m_TrackingRenderer->SetLayer(1);// empty
+    m_ImageRenderer->SetLayer(2);   // only layer
+  }
+  else if (m_VTKRenderer->GetActors()->GetNumberOfItems() == 0 && m_TrackingRenderer->GetActors()->GetNumberOfItems() != 0)
+  {
+    m_VTKRenderer->SetLayer(0);      // empty
+    m_TrackingRenderer->SetLayer(1); // first
+    m_ImageRenderer->SetLayer(2);    // foreground, but transparent
+  }
+  else if (m_VTKRenderer->GetActors()->GetNumberOfItems() != 0 && m_TrackingRenderer->GetActors()->GetNumberOfItems() == 0)
+  {
+    m_TrackingRenderer->SetLayer(0); // empty
+    m_VTKRenderer->SetLayer(1);      // first
+    m_ImageRenderer->SetLayer(2);    // foreground, but transparent
+  }
+  else
+  {
+    m_VTKRenderer->SetLayer(0);      // models first
+    m_TrackingRenderer->SetLayer(1); // tracking glyphs on top
+    m_ImageRenderer->SetLayer(2);    // foreground, but transparent
+  }
+}
+
+
+//-----------------------------------------------------------------------------
 void MainRenderingWidget::SetEnableModels(bool isEnabled, vtkRenderer* renderer, std::vector<VTKModelInterface*>& models)
 {
   if (isEnabled)
@@ -130,6 +165,8 @@ void MainRenderingWidget::SetEnableModels(bool isEnabled, vtkRenderer* renderer,
       }
     }
   }
+  renderer->ResetCamera();
+  this->UpdateLayers();
 }
 
 
@@ -213,6 +250,7 @@ void MainRenderingWidget::SetEnableImage(bool isEnabled)
       m_Timer->stop();
     }
   }
+  this->UpdateLayers();
 }
 
 

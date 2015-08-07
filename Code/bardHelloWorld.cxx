@@ -17,6 +17,7 @@
 #include <bardOpenCVVideoSource.h>
 #include <bardArucoProcessor.h>
 #include <bardPnPRegistration.h>
+#include <bardTrackingModelData.h>
 #include <bardMainWindow.h>
 #include <bardMainRenderingWidget.h>
 
@@ -29,11 +30,13 @@ int main(int argc, char** argv)
   bard::OpenCVVideoSource mySource("");
   bard::ArucoProcessor myProcessor;
   bard::PnPRegistration myRegistration;
+  bard::TrackingModelData myTrackingModel(argv[1]);
 
   bard::MainRenderingWidget myWidget;
   myWidget.SetVideoSource(&mySource);
   myWidget.SetTagProcessor(&myProcessor);
   myWidget.SetRegistrationAlgorithm(&myRegistration);
+  myWidget.AddTrackingModel(&myTrackingModel);
   myWidget.SetImageOpacity(0.5);
 
   bard::MainWindow mainWin;
@@ -41,6 +44,7 @@ int main(int argc, char** argv)
   mainWin.show();
 
   myWidget.SetEnableImage(true);
+  myWidget.SetEnableTrackingModels(true);
 
   return app.exec();
 }

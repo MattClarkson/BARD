@@ -75,6 +75,7 @@ private:
   void SetImageCameraToFaceImage();
   void SetEnableModels(bool isEnabled, vtkRenderer* renderer, std::vector<VTKModelInterface*>& models);
   bool GetEnableModels(vtkRenderer* renderer) const;
+  void UpdateLayers();
 
   // To store camera intrinsic parameters;
   cv::Matx33d                          m_Intrinsics;

@@ -20,6 +20,7 @@ set(VIDEO_SRCS
   bardTagProcessingInterface.cxx
   bardArucoProcessor.cxx
   bardModelData.cxx
+  bardTrackingModelData.cxx
   bardRegistrationInterface.cxx
   bardPnPRegistration.cxx
   bardVTKModelInterface.cxx

@@ -34,7 +34,7 @@ public:
   /**
    * \brief Implementing classes return a pointer to their internal ModelData
    */
-  virtual ModelData* GetTrackingModel() const = 0;
+  virtual std::vector<ModelData> GetTrackingModel() const = 0;
 };
 
 } // end namespace
