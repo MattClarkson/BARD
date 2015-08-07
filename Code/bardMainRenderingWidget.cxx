@@ -26,7 +26,8 @@ MainRenderingWidget::MainRenderingWidget()
 : m_VideoSource(NULL)
 , m_ImageImporter(NULL)
 , m_ImageActor(NULL)
-, m_Renderer(NULL)
+, m_ImageRenderer(NULL)
+, m_VTKRenderer(NULL)
 , m_TagProcessor(NULL)
 , m_TagModel(NULL)
 , m_RegistrationAlgorithm(NULL)
@@ -44,9 +45,13 @@ MainRenderingWidget::MainRenderingWidget()
   m_ImageActor = vtkSmartPointer<vtkImageActor>::New();
   m_ImageActor->SetInputData(m_ImageImporter->GetOutput());
 
-  m_Renderer = vtkSmartPointer<vtkRenderer>::New();
-  m_Renderer->InteractiveOff();
-  this->GetRenderWindow()->AddRenderer(m_Renderer);
+  m_ImageRenderer = vtkSmartPointer<vtkRenderer>::New();
+  m_ImageRenderer->InteractiveOff();
+  this->GetRenderWindow()->AddRenderer(m_ImageRenderer);
+
+  m_VTKRenderer = vtkSmartPointer<vtkRenderer>::New();
+  m_VTKRenderer->InteractiveOff();
+  this->GetRenderWindow()->AddRenderer(m_VTKRenderer);
 
   m_CalibratedCamera = vtkSmartPointer<CalibratedCamera>::New();
   m_WorldToCameraTransform = vtkSmartPointer<vtkMatrix4x4>::New();
@@ -104,21 +109,68 @@ void MainRenderingWidget::SetVideoSource(bard::VideoSourceInterface* source)
 
 
 //-----------------------------------------------------------------------------
+void MainRenderingWidget::AddVTKModel(bard::VTKModelInterface* model)
+{
+  m_VTKModels.push_back(model);
+}
+
+
+//-----------------------------------------------------------------------------
+void MainRenderingWidget::SetEnableVTKModels(bool isEnabled)
+{
+  if (isEnabled)
+  {
+    if (m_VTKRenderer->GetActors()->GetNumberOfItems() == 0)
+    {
+      for (unsigned int i = 0; i < m_VTKModels.size(); i++)
+      {
+        m_VTKRenderer->AddActor(m_VTKModels[i]->GetActor());
+      }
+    }
+  }
+  else
+  {
+    if (m_VTKRenderer->GetActors()->GetNumberOfItems() > 0)
+    {
+      for (unsigned int i = 0; i < m_VTKModels.size(); i++)
+      {
+        m_VTKRenderer->RemoveActor(m_VTKModels[i]->GetActor());
+      }
+    }
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+bool MainRenderingWidget::GetVTKModelsAreEnabled() const
+{
+  if (m_VTKRenderer->GetActors()->GetNumberOfItems() > 0)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+
+//-----------------------------------------------------------------------------
 void MainRenderingWidget::SetEnableImage(bool isEnabled)
 {
   if (isEnabled)
   {
-    if (m_Renderer->GetActors()->GetNumberOfItems() == 0)
+    if (m_ImageRenderer->GetActors()->GetNumberOfItems() == 0)
     {
-      m_Renderer->AddActor(m_ImageActor);
+      m_ImageRenderer->AddActor(m_ImageActor);
       m_Timer->start();
     }
   }
   else
   {
-    if (m_Renderer->GetActors()->GetNumberOfItems() > 0)
+    if (m_ImageRenderer->GetActors()->GetNumberOfItems() > 0)
     {
-      m_Renderer->RemoveActor(m_ImageActor);
+      m_ImageRenderer->RemoveActor(m_ImageActor);
       m_Timer->stop();
     }
   }
@@ -128,7 +180,7 @@ void MainRenderingWidget::SetEnableImage(bool isEnabled)
 //-----------------------------------------------------------------------------
 bool MainRenderingWidget::GetImageIsEnabled() const
 {
-  if (m_Renderer->GetActors()->GetNumberOfItems() > 0)
+  if (m_ImageRenderer->GetActors()->GetNumberOfItems() > 0)
   {
     return true;
   }
@@ -142,7 +194,7 @@ bool MainRenderingWidget::GetImageIsEnabled() const
 //-----------------------------------------------------------------------------
 void MainRenderingWidget::SetImageCameraToFaceImage()
 {
-  vtkCamera* camera = m_Renderer->GetActiveCamera();
+  vtkCamera* camera = m_ImageRenderer->GetActiveCamera();
 
   int    windowSize[2];
   windowSize[0] = this->GetRenderWindow()->GetSize()[0];
