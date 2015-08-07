@@ -34,6 +34,11 @@ MainRenderingWidget::MainRenderingWidget()
 , m_TrackingRenderer(NULL)
 , m_CalibratedCamera(NULL)
 , m_WorldToCameraTransform(NULL)
+, m_CameraToWorldTransform(NULL)
+, m_OutputDirectory("")
+, m_RecordMatrix(false)
+, m_RecordPointOfInterest(false)
+, m_FrameCounter(0)
 {
 
   // ToDo: Set the image size used at calibration.
@@ -76,6 +81,9 @@ MainRenderingWidget::MainRenderingWidget()
 
   m_WorldToCameraTransform = vtkSmartPointer<vtkMatrix4x4>::New();
   m_WorldToCameraTransform->Identity();
+
+  m_CameraToWorldTransform = vtkSmartPointer<vtkMatrix4x4>::New();
+  m_CameraToWorldTransform->Identity();
 }
 
 
@@ -103,6 +111,27 @@ void MainRenderingWidget::SetCameraIntrinsics(const cv::Matx33d& intrinsics)
 void MainRenderingWidget::SetCalibratedImageSize(const cv::Point2i& imageSize)
 {
   m_CalibratedImageSize = imageSize;
+}
+
+
+//-----------------------------------------------------------------------------
+void MainRenderingWidget::SetOutputDirectory(const std::string& output)
+{
+  m_OutputDirectory = output;
+}
+
+
+//-----------------------------------------------------------------------------
+void MainRenderingWidget::SetRecordMatrix(bool doRecord)
+{
+  m_RecordMatrix = doRecord;
+}
+
+
+//-----------------------------------------------------------------------------
+void MainRenderingWidget::SetRecordPointOfInterest(bool doRecord)
+{
+  m_RecordPointOfInterest = doRecord;
 }
 
 
@@ -402,9 +431,37 @@ void MainRenderingWidget::OnTimerTriggered()
           vtkSmartPointer<vtkMatrix4x4> matrix = m_RegistrationAlgorithm->DoRegistration(m_Intrinsics, m_TrackingModels[0]->GetTrackingModel(), tags);
           this->SetWorldToCameraTransform(*matrix);
         }
+
+        // If there are any more tracking models, they use the first tracking model as a reference.
+        if (m_TrackingModels.size() > 1)
+        {
+          for (int i = 1; i < m_TrackingModels.size(); i++)
+          {
+            std::vector<ModelData> trackingModel = m_TrackingModels[i]->GetTrackingModel();
+            vtkSmartPointer<vtkMatrix4x4> modelToCamera = m_RegistrationAlgorithm->DoRegistration(m_Intrinsics, trackingModel, tags);
+            vtkSmartPointer<vtkMatrix4x4> modelToWorld = vtkSmartPointer<vtkMatrix4x4>::New();
+            vtkMatrix4x4::Multiply4x4(m_CameraToWorldTransform, modelToCamera, modelToWorld);
+
+            if (m_RecordMatrix)
+            {
+              this->WriteMatrix(i, *modelToWorld);
+            }
+            if (m_RecordPointOfInterest)
+            {
+              for (int j = 0; j < trackingModel.size(); j++)
+              {
+                if (trackingModel[j].GetPointId() == 999)
+                {
+                  cv::Point3d point = trackingModel[j].GetPoint();
+                  this->WritePoint(i, *modelToWorld, point);
+                }
+              } // end for each point in chosen tracking model
+            } // end if recording points of interest
+          } // end for each non-reference tracking model
+        } // end if we have non-reference tracking models
       }
       m_ImageImporter->Modified();
-      m_ImageImporter->Update(); // this is what pulls a new image in.
+      m_ImageImporter->Update(); // this is what pulls a new image into the VTK rendering pipeline so we can visualise it.
 
       this->SetImageCameraToFaceImage();
       this->GetRenderWindow()->Render();
@@ -416,8 +473,10 @@ void MainRenderingWidget::OnTimerTriggered()
 //-----------------------------------------------------------------------------
 void MainRenderingWidget::SetWorldToCameraTransform(const vtkMatrix4x4& matrix)
 {
-  // ToDo: Set this when PnP algorithm giving nice results.
+  // ToDo: Set this when PnP algorithm is giving nice results.
   // m_WorldToCameraTransform->DeepCopy(&matrix);
+  m_CameraToWorldTransform->DeepCopy(m_WorldToCameraTransform);
+  m_CameraToWorldTransform->Invert();
   m_CalibratedCamera->SetActualWindowSize(this->width(), this->height());
   m_CalibratedCamera->SetCalibratedImageSize(m_CalibratedImageSize.x, m_CalibratedImageSize.y);
   m_CalibratedCamera->SetExtrinsicParameters(m_WorldToCameraTransform);
@@ -430,6 +489,20 @@ vtkSmartPointer<vtkMatrix4x4> MainRenderingWidget::GetWorldToCameraTransform() c
   vtkSmartPointer<vtkMatrix4x4> result = vtkSmartPointer<vtkMatrix4x4>::New();
   result->DeepCopy(m_WorldToCameraTransform);
   return result;
+}
+
+
+//-----------------------------------------------------------------------------
+void MainRenderingWidget::WriteMatrix(int i, vtkMatrix4x4& matrix)
+{
+  // ToDo: Write matrix to output directory
+}
+
+
+//-----------------------------------------------------------------------------
+void MainRenderingWidget::WritePoint(int i, vtkMatrix4x4& matrix, cv::Point3d& point)
+{
+  // ToDo: Write point to output directory
 }
 
 } // end namespace

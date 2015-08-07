@@ -48,6 +48,10 @@ public:
   void SetCameraIntrinsics(const cv::Matx33d& intrinsics);
   void SetCalibratedImageSize(const cv::Point2i& imageSize);
 
+  void SetOutputDirectory(const std::string& output);
+  void SetRecordMatrix(bool doRecord);
+  void SetRecordPointOfInterest(bool doRecord);
+
   void SetVideoSource(bard::VideoSourceInterface* source);
   void SetTagProcessor(bard::TagProcessingInterface* processor);
   void SetRegistrationAlgorithm(bard::RegistrationInterface* registration);
@@ -78,6 +82,8 @@ private:
   void SetEnableModels(bool isEnabled, vtkRenderer* renderer, std::vector<VTKModelInterface*>& models);
   bool GetEnableModels(vtkRenderer* renderer) const;
   void UpdateLayers();
+  void WriteMatrix(int i, vtkMatrix4x4& matrix);
+  void WritePoint(int i, vtkMatrix4x4& matrix, cv::Point3d& point);
 
   // To store camera intrinsic parameters;
   cv::Matx33d                          m_Intrinsics;
@@ -111,6 +117,11 @@ private:
   vtkSmartPointer<vtkRenderer>         m_TrackingRenderer;
   vtkSmartPointer<CalibratedCamera>    m_CalibratedCamera;
   vtkSmartPointer<vtkMatrix4x4>        m_WorldToCameraTransform;
+  vtkSmartPointer<vtkMatrix4x4>        m_CameraToWorldTransform;
+  std::string                          m_OutputDirectory;
+  bool                                 m_RecordMatrix;
+  bool                                 m_RecordPointOfInterest;
+  unsigned long int                    m_FrameCounter;
 };
 
 } // end namespace

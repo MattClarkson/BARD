@@ -37,6 +37,8 @@ int main(int argc, char** argv)
     TCLAP::ValueArg<float> imageOpacityArg("o","opacity","Image opacity.",false,0.5,"float");
     TCLAP::SwitchArg doDistortionArg("c","correct","Do distortion correction.", false);
     TCLAP::SwitchArg flipSwitchArg("f","flip","Flip in Y-axis.", false);
+    TCLAP::SwitchArg pointerRecordMatrixArg("r","record","Record pointer matrix (e.g. for pivot calib).", false);
+    TCLAP::SwitchArg pointerRecordTipArg("t","tip","Record pointer tip (e.g. for registration).", false);
     cmd.add( intrinsicsArg );
     cmd.add( worldRefArg );
     cmd.add( pointerRefArg );
@@ -44,6 +46,8 @@ int main(int argc, char** argv)
     cmd.add( imageOpacityArg );
     cmd.add( doDistortionArg );
     cmd.add( flipSwitchArg );
+    cmd.add( pointerRecordMatrixArg );
+    cmd.add( pointerRecordTipArg );
     cmd.parse( argc, argv );
     std::string intrinsicsFile = intrinsicsArg.getValue();
     std::string worldRef = worldRefArg.getValue();
@@ -52,6 +56,13 @@ int main(int argc, char** argv)
     float opacity = imageOpacityArg.getValue();
     bool doDistortionCorrection = doDistortionArg.getValue();
     bool doFlipY = flipSwitchArg.getValue();
+    bool pointerRecordMatrix = pointerRecordMatrixArg.getValue();
+    bool pointerRecordTip =pointerRecordTipArg.getValue();
+
+    if ((pointerRecordMatrix || pointerRecordTip) && pointerRef.size() == 0)
+    {
+      throw std::runtime_error("You asked to record pointer movement, but did not provide a pointer reference model.");
+    }
 
     QApplication app(argc, argv);
     app.setOrganizationName("CMIC");

@@ -81,6 +81,9 @@ bool OpenCVVideoSource::GrabImage()
 
   cvtColor(m_CurrentFrameInBGR, m_CurrentFrameInRGB, CV_BGR2RGB);
 
+  // ToDo: Flip image if necessary
+  // ToDo: Distortion correction
+
   return true;
 }
 
