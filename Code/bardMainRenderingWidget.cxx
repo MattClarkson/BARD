@@ -24,13 +24,15 @@ namespace bard
 //-----------------------------------------------------------------------------
 MainRenderingWidget::MainRenderingWidget()
 : m_VideoSource(NULL)
+, m_TagProcessor(NULL)
+, m_RegistrationAlgorithm(NULL)
+, m_Timer(NULL)
 , m_ImageImporter(NULL)
 , m_ImageActor(NULL)
 , m_ImageRenderer(NULL)
 , m_VTKRenderer(NULL)
-, m_TagProcessor(NULL)
-, m_TagModel(NULL)
-, m_RegistrationAlgorithm(NULL)
+, m_TrackingRenderer(NULL)
+, m_CalibratedCamera(NULL)
 , m_WorldToCameraTransform(NULL)
 {
   m_Timer = new QTimer();
@@ -52,6 +54,10 @@ MainRenderingWidget::MainRenderingWidget()
   m_VTKRenderer = vtkSmartPointer<vtkRenderer>::New();
   m_VTKRenderer->InteractiveOff();
   this->GetRenderWindow()->AddRenderer(m_VTKRenderer);
+
+  m_TrackingRenderer = vtkSmartPointer<vtkRenderer>::New();
+  m_TrackingRenderer->InteractiveOff();
+  this->GetRenderWindow()->AddRenderer(m_TrackingRenderer);
 
   m_CalibratedCamera = vtkSmartPointer<CalibratedCamera>::New();
   m_WorldToCameraTransform = vtkSmartPointer<vtkMatrix4x4>::New();
@@ -77,6 +83,17 @@ void MainRenderingWidget::SetCameraIntrinsics(const cv::Matx33d& intrinsics)
 
 
 //-----------------------------------------------------------------------------
+void MainRenderingWidget::SetVideoSource(bard::VideoSourceInterface* source)
+{
+  m_VideoSource = source;
+  m_ImageImporter->SetImportVoidPointer(const_cast<unsigned char*>(source->ExposeImage()));
+  m_ImageImporter->SetWholeExtent(1, source->GetWidth(), 1, source->GetHeight(), 1, 1);
+  m_ImageImporter->SetDataExtentToWholeExtent();
+  m_ImageImporter->Update();
+}
+
+
+//-----------------------------------------------------------------------------
 void MainRenderingWidget::SetTagProcessor(bard::TagProcessingInterface* processor)
 {
   m_TagProcessor = processor;
@@ -91,20 +108,68 @@ void MainRenderingWidget::SetRegistrationAlgorithm(bard::RegistrationInterface* 
 
 
 //-----------------------------------------------------------------------------
-void MainRenderingWidget::SetModel(std::vector<ModelData>& model)
+void MainRenderingWidget::SetEnableModels(bool isEnabled, vtkRenderer* renderer, std::vector<VTKModelInterface*>& models)
 {
-  m_TagModel = &model;
+  if (isEnabled)
+  {
+    if (renderer->GetActors()->GetNumberOfItems() == 0)
+    {
+      for (unsigned int i = 0; i < models.size(); i++)
+      {
+        renderer->AddActor(models[i]->GetActor());
+      }
+    }
+  }
+  else
+  {
+    if (renderer->GetActors()->GetNumberOfItems() > 0)
+    {
+      for (unsigned int i = 0; i < models.size(); i++)
+      {
+        renderer->RemoveActor(models[i]->GetActor());
+      }
+    }
+  }
 }
 
 
 //-----------------------------------------------------------------------------
-void MainRenderingWidget::SetVideoSource(bard::VideoSourceInterface* source)
+bool MainRenderingWidget::GetEnableModels(vtkRenderer* renderer) const
 {
-  m_VideoSource = source;
-  m_ImageImporter->SetImportVoidPointer(const_cast<unsigned char*>(source->ExposeImage()));
-  m_ImageImporter->SetWholeExtent(1, source->GetWidth(), 1, source->GetHeight(), 1, 1);
-  m_ImageImporter->SetDataExtentToWholeExtent();
-  m_ImageImporter->Update();
+  if (renderer->GetActors()->GetNumberOfItems() > 0)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+void MainRenderingWidget::AddTrackingModel(bard::TrackingModelInterface* model)
+{
+  m_TrackingModels.push_back(model);
+}
+
+
+//-----------------------------------------------------------------------------
+void MainRenderingWidget::SetEnableTrackingModels(bool isEnabled)
+{
+  std::vector<VTKModelInterface*> tmp;
+  for (int i = 0; i < m_TrackingModels.size(); i++)
+  {
+    tmp.push_back(dynamic_cast<VTKModelInterface*>(m_TrackingModels[i]));
+  }
+  this->SetEnableModels(isEnabled, m_TrackingRenderer, tmp);
+}
+
+
+//-----------------------------------------------------------------------------
+bool MainRenderingWidget::GetTrackingModelsAreEnabled() const
+{
+  return this->GetEnableModels(m_TrackingRenderer);
 }
 
 
@@ -118,40 +183,14 @@ void MainRenderingWidget::AddVTKModel(bard::VTKModelInterface* model)
 //-----------------------------------------------------------------------------
 void MainRenderingWidget::SetEnableVTKModels(bool isEnabled)
 {
-  if (isEnabled)
-  {
-    if (m_VTKRenderer->GetActors()->GetNumberOfItems() == 0)
-    {
-      for (unsigned int i = 0; i < m_VTKModels.size(); i++)
-      {
-        m_VTKRenderer->AddActor(m_VTKModels[i]->GetActor());
-      }
-    }
-  }
-  else
-  {
-    if (m_VTKRenderer->GetActors()->GetNumberOfItems() > 0)
-    {
-      for (unsigned int i = 0; i < m_VTKModels.size(); i++)
-      {
-        m_VTKRenderer->RemoveActor(m_VTKModels[i]->GetActor());
-      }
-    }
-  }
+  this->SetEnableModels(isEnabled, m_VTKRenderer, m_VTKModels);
 }
 
 
 //-----------------------------------------------------------------------------
 bool MainRenderingWidget::GetVTKModelsAreEnabled() const
 {
-  if (m_VTKRenderer->GetActors()->GetNumberOfItems() > 0)
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  return this->GetEnableModels(m_VTKRenderer);
 }
 
 
@@ -296,6 +335,7 @@ void MainRenderingWidget::OnTimerTriggered()
       if (m_TagProcessor != NULL)
       {
         std::vector<TagData> tags = m_TagProcessor->GetTags(*(m_VideoSource->ExposeOpenCVImage()));
+/*
         if (tags.size() > 0 &&
             m_TagModel != NULL &&
             m_TagModel->size() > 0 &&
@@ -304,6 +344,7 @@ void MainRenderingWidget::OnTimerTriggered()
           vtkSmartPointer<vtkMatrix4x4> matrix = m_RegistrationAlgorithm->DoRegistration(m_Intrinsics, *m_TagModel, tags);
           this->SetWorldToCameraTransform(*matrix);
         }
+*/
       }
       m_ImageImporter->Modified();
       m_ImageImporter->Update(); // this is what pulls a new image in.
@@ -321,7 +362,6 @@ void MainRenderingWidget::SetWorldToCameraTransform(const vtkMatrix4x4& matrix)
   m_WorldToCameraTransform->DeepCopy(&matrix);
 
   // aim here is to move the VTK camera of the main render window to match position described by matrix.
-
 }
 
 

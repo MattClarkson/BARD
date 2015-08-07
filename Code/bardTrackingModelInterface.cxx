@@ -11,32 +11,20 @@
   See LICENSE.txt in the top level directory for details.
 
 ============================================================================*/
-#ifndef bardVTKModelInterface_h
-#define bardVTKModelInterface_h
-
-#include <vtkActor.h>
-#include <vtkSmartPointer.h>
+#include "bardTrackingModelInterface.h"
 
 namespace bard
 {
 
-/**
- * \class VTKModelInterface
- * \brief Abstract class describing methods to access a VTK model (source, polydata, mapper, actor etc).
- */
-class VTKModelInterface {
+//-----------------------------------------------------------------------------
+TrackingModelInterface::TrackingModelInterface()
+{
+}
 
-public:
 
-  VTKModelInterface();
-  virtual ~VTKModelInterface();
-
-  /**
-   * \brief Implementing classes return a pointer to their internal actor.
-   */
-  virtual vtkSmartPointer<vtkActor> GetActor() const = 0;
-};
+//-----------------------------------------------------------------------------
+TrackingModelInterface::~TrackingModelInterface()
+{
+}
 
 } // end namespace
-
-#endif

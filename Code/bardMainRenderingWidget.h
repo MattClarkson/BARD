@@ -25,8 +25,8 @@
 #include "bardCalibratedCamera.h"
 #include "bardTagProcessingInterface.h"
 #include "bardRegistrationInterface.h"
+#include "bardTrackingModelInterface.h"
 #include "bardVTKModelInterface.h"
-#include "bardModelData.h"
 
 namespace bard
 {
@@ -49,7 +49,10 @@ public:
   void SetVideoSource(bard::VideoSourceInterface* source);
   void SetTagProcessor(bard::TagProcessingInterface* processor);
   void SetRegistrationAlgorithm(bard::RegistrationInterface* registration);
-  void SetModel(std::vector<ModelData>& model);
+
+  void AddTrackingModel(bard::TrackingModelInterface* model);
+  void SetEnableTrackingModels(bool isEnabled);
+  bool GetTrackingModelsAreEnabled() const;
 
   void AddVTKModel(bard::VTKModelInterface* model);
   void SetEnableVTKModels(bool isEnabled);
@@ -70,32 +73,40 @@ private slots:
 private:
 
   void SetImageCameraToFaceImage();
+  void SetEnableModels(bool isEnabled, vtkRenderer* renderer, std::vector<VTKModelInterface*>& models);
+  bool GetEnableModels(vtkRenderer* renderer) const;
 
   // To store camera intrinsic parameters;
-  cv::Matx33d                       m_Intrinsics;
+  cv::Matx33d                          m_Intrinsics;
 
-  // Video source is passed in, so this class does not own in, hence doesn't delete it.
-  bard::VideoSourceInterface       *m_VideoSource;
+  // Here, when I say 'Dependency Injection' I mean:
+  // a) Objects are passed in, so this class does NOT own them.
+  // b) This means that this class does NOT manage their lifecycle (eg. deletion).
 
-  // For extracting some tags from the video image
-  bard::TagProcessingInterface     *m_TagProcessor;
+  // Dependency Injection: Video source, OpenCV, from file, etc.
+  bard::VideoSourceInterface          *m_VideoSource;
 
-  // For matching 3D to 2D points to compute a pose of the camera.
-  bard::RegistrationInterface      *m_RegistrationAlgorithm;
+  // Dependency Injection: To extract tags, ArUco, AprilTags, etc.
+  bard::TagProcessingInterface        *m_TagProcessor;
 
-  // The model that describes the coordinates of the tags in world space.
-  std::vector<ModelData>           *m_TagModel;
+  // Dependency Injection: To calculate pose, PnP, PnP with RANSAC, etc.
+  bard::RegistrationInterface         *m_RegistrationAlgorithm;
+
+  // Dependency Injection: We store pointers to any number of Tracking models.
+  std::vector<TrackingModelInterface*> m_TrackingModels;
+
+  // Dependency Injection: We store pointers to any number of VTK models to render.
+  std::vector<VTKModelInterface*>      m_VTKModels;
 
   // Locally owned objects.
-  QTimer                           *m_Timer;
-  vtkSmartPointer<vtkImageImport>   m_ImageImporter;
-  vtkSmartPointer<vtkImageActor>    m_ImageActor;
-  vtkSmartPointer<vtkRenderer>      m_ImageRenderer;
-  vtkSmartPointer<vtkRenderer>      m_VTKRenderer;
-  vtkSmartPointer<CalibratedCamera> m_CalibratedCamera;
-  vtkSmartPointer<vtkMatrix4x4>     m_WorldToCameraTransform;
-  std::vector<VTKModelInterface*>   m_VTKModels;
-
+  QTimer                              *m_Timer;
+  vtkSmartPointer<vtkImageImport>      m_ImageImporter;
+  vtkSmartPointer<vtkImageActor>       m_ImageActor;
+  vtkSmartPointer<vtkRenderer>         m_ImageRenderer;
+  vtkSmartPointer<vtkRenderer>         m_VTKRenderer;
+  vtkSmartPointer<vtkRenderer>         m_TrackingRenderer;
+  vtkSmartPointer<CalibratedCamera>    m_CalibratedCamera;
+  vtkSmartPointer<vtkMatrix4x4>        m_WorldToCameraTransform;
 };
 
 } // end namespace

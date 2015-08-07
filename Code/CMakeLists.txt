@@ -23,6 +23,7 @@ set(VIDEO_SRCS
   bardRegistrationInterface.cxx
   bardPnPRegistration.cxx
   bardVTKModelInterface.cxx
+  bardTrackingModelInterface.cxx
 )
 
 SET(QT_SOURCES_CPP
