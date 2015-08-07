@@ -19,6 +19,10 @@ set(VIDEO_SRCS
   bardTagData.cxx
   bardTagProcessingInterface.cxx
   bardArucoProcessor.cxx
+  bardModelData.cxx
+  bardRegistrationInterface.cxx
+  bardPnPRegistration.cxx
+  bardVTKModelInterface.cxx
 )
 
 SET(QT_SOURCES_CPP

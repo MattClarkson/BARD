@@ -36,6 +36,62 @@ ArucoProcessor::~ArucoProcessor()
 
 
 //-----------------------------------------------------------------------------
+void ArucoProcessor::SetMinSize(float minSize)
+{
+  m_MinSize = minSize;
+}
+
+
+//-----------------------------------------------------------------------------
+float ArucoProcessor::GetMinSize() const
+{
+  return m_MinSize;
+}
+
+
+//-----------------------------------------------------------------------------
+void ArucoProcessor::SetMaxSize(float maxSize)
+{
+  m_MaxSize = maxSize;
+}
+
+
+//-----------------------------------------------------------------------------
+float ArucoProcessor::GetMaxSize() const
+{
+  return m_MaxSize;
+}
+
+
+//-----------------------------------------------------------------------------
+void ArucoProcessor::SetBlockSize(int blockSize)
+{
+  m_BlockSize = blockSize;
+}
+
+
+//-----------------------------------------------------------------------------
+int ArucoProcessor::GetBlockSize() const
+{
+  return m_BlockSize;
+}
+
+
+//-----------------------------------------------------------------------------
+void ArucoProcessor::SetOffset(int offset)
+{
+  m_Offset = offset;
+}
+
+
+//-----------------------------------------------------------------------------
+int ArucoProcessor::GetOffset() const
+{
+  return m_Offset;
+}
+
+
+//-----------------------------------------------------------------------------
 std::vector<TagData> ArucoProcessor::GetTags(const cv::Mat& image) const
 {
   std::vector<TagData> results;

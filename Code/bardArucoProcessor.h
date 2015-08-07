@@ -31,9 +31,21 @@ public:
   ArucoProcessor();
   virtual ~ArucoProcessor();
 
+  void SetMinSize(float minSize);
+  float GetMinSize() const;
+
+  void SetMaxSize(float minSize);
+  float GetMaxSize() const;
+
+  void SetBlockSize(int blockSize);
+  int GetBlockSize() const;
+
+  void SetOffset(int offset);
+  int GetOffset() const;
+
   /**
-   * \see TagProcessingInterface::GetTags()
-   */
+  * \see TagProcessingInterface::GetTags()
+  */
   virtual std::vector<TagData> GetTags(const cv::Mat& image) const;
 
 private:

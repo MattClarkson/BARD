@@ -28,6 +28,9 @@ MainRenderingWidget::MainRenderingWidget()
 , m_ImageActor(NULL)
 , m_Renderer(NULL)
 , m_TagProcessor(NULL)
+, m_TagModel(NULL)
+, m_RegistrationAlgorithm(NULL)
+, m_WorldToCameraTransform(NULL)
 {
   m_Timer = new QTimer();
   m_Timer->setInterval(40);
@@ -46,6 +49,7 @@ MainRenderingWidget::MainRenderingWidget()
   this->GetRenderWindow()->AddRenderer(m_Renderer);
 
   m_CalibratedCamera = vtkSmartPointer<CalibratedCamera>::New();
+  m_WorldToCameraTransform = vtkSmartPointer<vtkMatrix4x4>::New();
 }
 
 
@@ -61,9 +65,30 @@ MainRenderingWidget::~MainRenderingWidget()
 
 
 //-----------------------------------------------------------------------------
+void MainRenderingWidget::SetCameraIntrinsics(const cv::Matx33d& intrinsics)
+{
+  m_Intrinsics = intrinsics;
+}
+
+
+//-----------------------------------------------------------------------------
 void MainRenderingWidget::SetTagProcessor(bard::TagProcessingInterface* processor)
 {
   m_TagProcessor = processor;
+}
+
+
+//-----------------------------------------------------------------------------
+void MainRenderingWidget::SetRegistrationAlgorithm(bard::RegistrationInterface* registration)
+{
+  m_RegistrationAlgorithm = registration;
+}
+
+
+//-----------------------------------------------------------------------------
+void MainRenderingWidget::SetModel(std::vector<ModelData>& model)
+{
+  m_TagModel = &model;
 }
 
 
@@ -216,10 +241,17 @@ void MainRenderingWidget::OnTimerTriggered()
   {
     if(m_VideoSource->GrabImage())
     {
-
       if (m_TagProcessor != NULL)
       {
         std::vector<TagData> tags = m_TagProcessor->GetTags(*(m_VideoSource->ExposeOpenCVImage()));
+        if (tags.size() > 0 &&
+            m_TagModel != NULL &&
+            m_TagModel->size() > 0 &&
+            m_RegistrationAlgorithm != NULL)
+        {
+          vtkSmartPointer<vtkMatrix4x4> matrix = m_RegistrationAlgorithm->DoRegistration(m_Intrinsics, *m_TagModel, tags);
+          this->SetWorldToCameraTransform(*matrix);
+        }
       }
       m_ImageImporter->Modified();
       m_ImageImporter->Update(); // this is what pulls a new image in.
@@ -234,7 +266,19 @@ void MainRenderingWidget::OnTimerTriggered()
 //-----------------------------------------------------------------------------
 void MainRenderingWidget::SetWorldToCameraTransform(const vtkMatrix4x4& matrix)
 {
+  m_WorldToCameraTransform->DeepCopy(&matrix);
 
+  // aim here is to move the VTK camera of the main render window to match position described by matrix.
+
+}
+
+
+//-----------------------------------------------------------------------------
+vtkSmartPointer<vtkMatrix4x4> MainRenderingWidget::GetWorldToCameraTransform() const
+{
+  vtkSmartPointer<vtkMatrix4x4> result = vtkSmartPointer<vtkMatrix4x4>::New();
+  result->DeepCopy(m_WorldToCameraTransform);
+  return result;
 }
 
 } // end namespace

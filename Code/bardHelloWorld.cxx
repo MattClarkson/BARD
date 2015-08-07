@@ -16,6 +16,7 @@
 
 #include <bardOpenCVVideoSource.h>
 #include <bardArucoProcessor.h>
+#include <bardPnPRegistration.h>
 #include <bardMainWindow.h>
 #include <bardMainRenderingWidget.h>
 
@@ -27,10 +28,12 @@ int main(int argc, char** argv)
 
   bard::OpenCVVideoSource mySource("");
   bard::ArucoProcessor myProcessor;
+  bard::PnPRegistration myRegistration;
 
   bard::MainRenderingWidget myWidget;
-  myWidget.SetTagProcessor(&myProcessor);
   myWidget.SetVideoSource(&mySource);
+  myWidget.SetTagProcessor(&myProcessor);
+  myWidget.SetRegistrationAlgorithm(&myRegistration);
   myWidget.SetImageOpacity(0.5);
 
   bard::MainWindow mainWin;
