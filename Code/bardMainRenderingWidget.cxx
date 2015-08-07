@@ -35,6 +35,11 @@ MainRenderingWidget::MainRenderingWidget()
 , m_CalibratedCamera(NULL)
 , m_WorldToCameraTransform(NULL)
 {
+
+  // ToDo: Set the image size used at calibration.
+  m_CalibratedImageSize.x = 640;
+  m_CalibratedImageSize.y = 480;
+
   m_Timer = new QTimer();
   m_Timer->setInterval(40);
   connect(m_Timer, SIGNAL(timeout()), this, SLOT(OnTimerTriggered()));
@@ -65,7 +70,12 @@ MainRenderingWidget::MainRenderingWidget()
   this->GetRenderWindow()->AddRenderer(m_TrackingRenderer);
 
   m_CalibratedCamera = vtkSmartPointer<CalibratedCamera>::New();
+  m_CalibratedCamera->SetUseCalibratedCamera(false);
+  m_VTKRenderer->SetActiveCamera(m_CalibratedCamera);
+  m_TrackingRenderer->SetActiveCamera(m_CalibratedCamera);
+
   m_WorldToCameraTransform = vtkSmartPointer<vtkMatrix4x4>::New();
+  m_WorldToCameraTransform->Identity();
 }
 
 
@@ -84,6 +94,15 @@ MainRenderingWidget::~MainRenderingWidget()
 void MainRenderingWidget::SetCameraIntrinsics(const cv::Matx33d& intrinsics)
 {
   m_Intrinsics = intrinsics;
+  m_CalibratedCamera->SetIntrinsicParameters(intrinsics(0,0), intrinsics(1,1), intrinsics(0,2), intrinsics(1,2));
+  m_CalibratedCamera->SetUseCalibratedCamera(true);
+}
+
+
+//-----------------------------------------------------------------------------
+void MainRenderingWidget::SetCalibratedImageSize(const cv::Point2i& imageSize)
+{
+  m_CalibratedImageSize = imageSize;
 }
 
 
@@ -383,7 +402,6 @@ void MainRenderingWidget::OnTimerTriggered()
           vtkSmartPointer<vtkMatrix4x4> matrix = m_RegistrationAlgorithm->DoRegistration(m_Intrinsics, m_TrackingModels[0]->GetTrackingModel(), tags);
           this->SetWorldToCameraTransform(*matrix);
         }
-
       }
       m_ImageImporter->Modified();
       m_ImageImporter->Update(); // this is what pulls a new image in.
@@ -398,9 +416,11 @@ void MainRenderingWidget::OnTimerTriggered()
 //-----------------------------------------------------------------------------
 void MainRenderingWidget::SetWorldToCameraTransform(const vtkMatrix4x4& matrix)
 {
-  m_WorldToCameraTransform->DeepCopy(&matrix);
-
-  // aim here is to move the VTK camera of the main render window to match position described by matrix.
+  // ToDo: Set this when PnP algorithm giving nice results.
+  // m_WorldToCameraTransform->DeepCopy(&matrix);
+  m_CalibratedCamera->SetActualWindowSize(this->width(), this->height());
+  m_CalibratedCamera->SetCalibratedImageSize(m_CalibratedImageSize.x, m_CalibratedImageSize.y);
+  m_CalibratedCamera->SetExtrinsicParameters(m_WorldToCameraTransform);
 }
 
 

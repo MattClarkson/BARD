@@ -50,3 +50,6 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(bard bard.cxx ${VIDEO_SRCS} ${QT_SOURCES_CPP} ${QT_SOURCES_H} ${QT_SOURCES_UI_H} ${QT_MOC_FILES})
 target_link_libraries(bard ${ALL_LIBS})
+
+add_executable(bardGrabber bardGrabber.cxx ${VIDEO_SRCS} ${QT_SOURCES_CPP} ${QT_SOURCES_H} ${QT_SOURCES_UI_H} ${QT_MOC_FILES})
+target_link_libraries(bardGrabber ${ALL_LIBS})

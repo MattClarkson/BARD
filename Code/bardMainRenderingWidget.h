@@ -46,6 +46,8 @@ public:
   ~MainRenderingWidget();
 
   void SetCameraIntrinsics(const cv::Matx33d& intrinsics);
+  void SetCalibratedImageSize(const cv::Point2i& imageSize);
+
   void SetVideoSource(bard::VideoSourceInterface* source);
   void SetTagProcessor(bard::TagProcessingInterface* processor);
   void SetRegistrationAlgorithm(bard::RegistrationInterface* registration);
@@ -79,6 +81,7 @@ private:
 
   // To store camera intrinsic parameters;
   cv::Matx33d                          m_Intrinsics;
+  cv::Point2i                          m_CalibratedImageSize;
 
   // Here, when I say 'Dependency Injection' I mean:
   // a) Objects are passed in, so this class does NOT own them.

@@ -82,6 +82,15 @@ void CalibratedCamera::SetIntrinsicParameters(const double& fx, const double& fy
 
 
 //----------------------------------------------------------------------------
+void CalibratedCamera::SetExtrinsicParameters(vtkSmartPointer<vtkMatrix4x4> matrix)
+{
+  // ToDo: Set pose.
+
+  this->Modified();
+}
+
+
+//----------------------------------------------------------------------------
 void CalibratedCamera::Render(vtkRenderer *ren)
 {
   // By default we do behaviour in base class.

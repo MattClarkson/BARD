@@ -30,7 +30,7 @@ int main(int argc, char** argv)
   try
   {
     TCLAP::CmdLine cmd("Basic Augmented Reality Demo", ' ', "0.1");
-    TCLAP::ValueArg<std::string> intrinsicsArg("i","intrinsics","File containing (3x3) camera intrinsics then (1x4) distortion coefficients.",true,"","string");
+    TCLAP::ValueArg<std::string> intrinsicsArg("i","intrinsics","File containing (3x3) camera intrinsics then (1x4) distortion coefficients.",false,"","string");
     TCLAP::ValueArg<std::string> worldRefArg("w","world","File containing (nx4) points of a tracker board defining world coordinates.",true,"","string");
     TCLAP::ValueArg<std::string> pointerRefArg("p","pointer","File containing (nx4) points of a tracker board defining pointer coordinates.",false,"","string");
     TCLAP::ValueArg<std::string> modelArg("m","model","vtkPolyData file a model to be rendered in the scene.",false,"","string");
