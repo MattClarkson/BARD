@@ -31,13 +31,13 @@ MainRenderingWidget::MainRenderingWidget()
 , m_TagProcessor(NULL)
 , m_RegistrationAlgorithm(NULL)
 , m_Timer(NULL)
+, m_TrackingCalibratedCamera(NULL)
+, m_VTKCalibratedCamera(NULL)
 , m_ImageImporter(NULL)
 , m_ImageActor(NULL)
 , m_ImageRenderer(NULL)
 , m_VTKRenderer(NULL)
 , m_TrackingRenderer(NULL)
-, m_TrackingCalibratedCamera(NULL)
-, m_VTKCalibratedCamera(NULL)
 , m_WorldToCameraTransform(NULL)
 , m_CameraToWorldTransform(NULL)
 , m_OutputDirectory("")
@@ -113,6 +113,10 @@ MainRenderingWidget::~MainRenderingWidget()
     m_Timer->stop();
     delete m_Timer;
   }
+  this->GetRenderWindow()->RemoveRenderer(m_BackgroundRenderer);
+  this->GetRenderWindow()->RemoveRenderer(m_ImageRenderer);
+  this->GetRenderWindow()->RemoveRenderer(m_VTKRenderer);
+  this->GetRenderWindow()->RemoveRenderer(m_TrackingRenderer);
 }
 
 

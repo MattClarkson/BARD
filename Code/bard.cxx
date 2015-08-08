@@ -34,6 +34,7 @@ int main(int argc, char** argv)
     TCLAP::ValueArg<std::string> worldRefArg("w","world","File containing (nx4) points of a tracker board defining world coordinates.",true,"","string");
     TCLAP::ValueArg<std::string> pointerRefArg("p","pointer","File containing (nx4) points of a tracker board defining pointer coordinates.",false,"","string");
     TCLAP::ValueArg<std::string> modelArg("m","model","vtkPolyData file a model to be rendered in the scene.",false,"","string");
+    TCLAP::ValueArg<std::string> outputDirArg("d", "directory", "Output directory to dump files", false, "", "string");
     TCLAP::ValueArg<float> imageOpacityArg("o","opacity","Image opacity.",false,0.5,"float");
     TCLAP::ValueArg<int> imageXSizeArg("x","xsize","xsize when calibrating.",true,1,"int");
     TCLAP::ValueArg<int> imageYSizeArg("y","ysize","ysize when calibrating.",true,1,"int");
@@ -45,6 +46,7 @@ int main(int argc, char** argv)
     cmd.add( worldRefArg );
     cmd.add( pointerRefArg );
     cmd.add( modelArg );
+    cmd.add( outputDirArg );
     cmd.add( imageOpacityArg );
     cmd.add( imageXSizeArg );
     cmd.add( imageYSizeArg );
@@ -57,6 +59,7 @@ int main(int argc, char** argv)
     std::string worldRef = worldRefArg.getValue();
     std::string pointerRef = pointerRefArg.getValue();
     std::string modelFile = modelArg.getValue();
+    std::string outputDir = outputDirArg.getValue();
     float opacity = imageOpacityArg.getValue();
     int xSize = imageXSizeArg.getValue();
     int ySize = imageYSizeArg.getValue();
@@ -68,6 +71,10 @@ int main(int argc, char** argv)
     if ((pointerRecordMatrix || pointerRecordTip) && pointerRef.size() == 0)
     {
       throw std::runtime_error("You asked to record pointer movement, but did not provide a pointer reference model.");
+    }
+    if ((pointerRecordMatrix || pointerRecordTip) && outputDir.size() == 0)
+    {
+      throw std::runtime_error("You asked to record pointer movement, but did not provide an output directory.");
     }
 
     cv::Point2i imageSize;
@@ -88,11 +95,11 @@ int main(int argc, char** argv)
 
     bard::MainRenderingWidget myWidget;
     myWidget.SetCalibratedImageSize(imageSize);
-
     myWidget.SetVideoSource(&mySource);
     myWidget.SetTagProcessor(&myProcessor);
     myWidget.SetRegistrationAlgorithm(&myRegistration);
     myWidget.SetImageOpacity(opacity);
+    myWidget.SetOutputDirectory(outputDir);
 
     cv::Matx33d intrinsicParameters;
     cv::Matx14d distortionParameters;

@@ -110,14 +110,14 @@ private:
 
   // Locally owned objects.
   QTimer                              *m_Timer;
+  vtkSmartPointer<CalibratedCamera>    m_TrackingCalibratedCamera;
+  vtkSmartPointer<CalibratedCamera>    m_VTKCalibratedCamera;
   vtkSmartPointer<vtkRenderer>         m_BackgroundRenderer;
   vtkSmartPointer<vtkImageImport>      m_ImageImporter;
   vtkSmartPointer<vtkImageActor>       m_ImageActor;
   vtkSmartPointer<vtkRenderer>         m_ImageRenderer;
   vtkSmartPointer<vtkRenderer>         m_VTKRenderer;
   vtkSmartPointer<vtkRenderer>         m_TrackingRenderer;
-  vtkSmartPointer<CalibratedCamera>    m_TrackingCalibratedCamera;
-  vtkSmartPointer<CalibratedCamera>    m_VTKCalibratedCamera;
   vtkSmartPointer<vtkMatrix4x4>        m_WorldToCameraTransform;
   vtkSmartPointer<vtkMatrix4x4>        m_CameraToWorldTransform;
   std::string                          m_OutputDirectory;
