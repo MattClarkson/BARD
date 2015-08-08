@@ -115,13 +115,7 @@ std::vector<TagData> ArucoProcessor::GetTags(const cv::Mat& image) const
       cv::Point2f c2f = markers[i][2];
       cv::Point2f c3f = markers[i][3];
 
-      cv::Point2d cd = cf;
-      cv::Point2d c0d = c0f;
-      cv::Point2d c1d = c1f;
-      cv::Point2d c2d = c2f;
-      cv::Point2d c3d = c3f;
-
-      bard::TagData tagData(markers[i].id, cd, c0d, c1d, c2d, c3d);
+      bard::TagData tagData(markers[i].id, cf, c0f, c1f, c2f, c3f);
       results.push_back(tagData);
     }
   }

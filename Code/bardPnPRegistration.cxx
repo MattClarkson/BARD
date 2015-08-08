@@ -44,13 +44,13 @@ vtkSmartPointer<vtkMatrix4x4> PnPRegistration::DoRegistration(
   {
     for (int j = 0; j < model.size(); j++)
     {
-      if (tags[i].GetPointId() == model[i].GetPointId())
+      if (tags[i].GetPointId() == model[j].GetPointId())
       {
-        points3D.push_back(model[i].GetCentrePoint());
-        points3D.push_back(model[i].GetCornerPoint(0));
-        points3D.push_back(model[i].GetCornerPoint(1));
-        points3D.push_back(model[i].GetCornerPoint(2));
-        points3D.push_back(model[i].GetCornerPoint(3));
+        points3D.push_back(model[j].GetCentrePoint());
+        points3D.push_back(model[j].GetCornerPoint(0));
+        points3D.push_back(model[j].GetCornerPoint(1));
+        points3D.push_back(model[j].GetCornerPoint(2));
+        points3D.push_back(model[j].GetCornerPoint(3));
         points2D.push_back(tags[i].GetCentrePoint());
         points2D.push_back(tags[i].GetCornerPoint(0));
         points2D.push_back(tags[i].GetCornerPoint(1));
@@ -86,7 +86,6 @@ vtkSmartPointer<vtkMatrix4x4> PnPRegistration::DoRegistration(
     }
     pose->SetElement(i, 3, tvec.at<double>(i, 0));
   }
-  std::cerr << "Matt, matrix is" << *pose << std::endl;
   return pose;
 }
 

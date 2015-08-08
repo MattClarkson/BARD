@@ -74,8 +74,8 @@ MainRenderingWidget::MainRenderingWidget()
 
   m_CalibratedCamera = vtkSmartPointer<CalibratedCamera>::New();
   m_CalibratedCamera->SetUseCalibratedCamera(false);
-  m_VTKRenderer->SetActiveCamera(m_CalibratedCamera);
-  m_TrackingRenderer->SetActiveCamera(m_CalibratedCamera);
+//  m_VTKRenderer->SetActiveCamera(m_CalibratedCamera);
+//  m_TrackingRenderer->SetActiveCamera(m_CalibratedCamera);
 
   m_WorldToCameraTransform = vtkSmartPointer<vtkMatrix4x4>::New();
   m_WorldToCameraTransform->Identity();
