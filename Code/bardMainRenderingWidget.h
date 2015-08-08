@@ -110,6 +110,7 @@ private:
 
   // Locally owned objects.
   QTimer                              *m_Timer;
+  vtkSmartPointer<vtkRenderer>         m_BackgroundRenderer;
   vtkSmartPointer<vtkImageImport>      m_ImageImporter;
   vtkSmartPointer<vtkImageActor>       m_ImageActor;
   vtkSmartPointer<vtkRenderer>         m_ImageRenderer;

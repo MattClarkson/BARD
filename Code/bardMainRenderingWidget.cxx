@@ -17,6 +17,8 @@
 
 #include <vtkRenderWindow.h>
 #include <vtkImageData.h>
+#include <vtkRendererCollection.h>
+
 #include <sstream>
 #include <ostream>
 
@@ -56,22 +58,27 @@ MainRenderingWidget::MainRenderingWidget()
   m_ImageActor = vtkSmartPointer<vtkImageActor>::New();
   m_ImageActor->SetInputData(m_ImageImporter->GetOutput());
 
-  this->GetRenderWindow()->SetNumberOfLayers(3);
+  this->GetRenderWindow()->SetNumberOfLayers(4);
+
+  m_BackgroundRenderer = vtkSmartPointer<vtkRenderer>::New();
+  m_BackgroundRenderer->InteractiveOff();
+  m_BackgroundRenderer->SetBackground(0, 0, 0);
+  m_BackgroundRenderer->SetLayer(0);
+  this->GetRenderWindow()->AddRenderer(m_BackgroundRenderer);
 
   m_ImageRenderer = vtkSmartPointer<vtkRenderer>::New();
   m_ImageRenderer->InteractiveOff();
-  m_ImageRenderer->SetLayer(0);
-  m_ImageRenderer->PreserveDepthBufferOn();
+  m_ImageRenderer->SetLayer(1);
   this->GetRenderWindow()->AddRenderer(m_ImageRenderer);
 
   m_VTKRenderer = vtkSmartPointer<vtkRenderer>::New();
   m_VTKRenderer->InteractiveOff();
-  m_VTKRenderer->SetLayer(1);
+  m_VTKRenderer->SetLayer(2);
   this->GetRenderWindow()->AddRenderer(m_VTKRenderer);
 
   m_TrackingRenderer = vtkSmartPointer<vtkRenderer>::New();
   m_TrackingRenderer->InteractiveOff();
-  m_TrackingRenderer->SetLayer(2);
+  m_TrackingRenderer->SetLayer(3);
   this->GetRenderWindow()->AddRenderer(m_TrackingRenderer);
 
   m_TrackingCalibratedCamera = vtkSmartPointer<CalibratedCamera>::New();
@@ -180,27 +187,27 @@ void MainRenderingWidget::UpdateLayers()
 {
   if (m_VTKRenderer->GetActors()->GetNumberOfItems() == 0 && m_TrackingRenderer->GetActors()->GetNumberOfItems() == 0)
   {
-    m_VTKRenderer->SetLayer(0);     // empty
-    m_TrackingRenderer->SetLayer(1);// empty
-    m_ImageRenderer->SetLayer(2);   // only layer
+    m_VTKRenderer->SetLayer(1);     // empty
+    m_TrackingRenderer->SetLayer(2);// empty
+    m_ImageRenderer->SetLayer(3);   // only live layer
   }
   else if (m_VTKRenderer->GetActors()->GetNumberOfItems() == 0 && m_TrackingRenderer->GetActors()->GetNumberOfItems() != 0)
   {
-    m_VTKRenderer->SetLayer(0);      // empty
-    m_TrackingRenderer->SetLayer(1); // first
-    m_ImageRenderer->SetLayer(2);    // foreground, but transparent
+    m_VTKRenderer->SetLayer(1);      // empty
+    m_TrackingRenderer->SetLayer(2); // first
+    m_ImageRenderer->SetLayer(3);    // foreground, but transparent
   }
   else if (m_VTKRenderer->GetActors()->GetNumberOfItems() != 0 && m_TrackingRenderer->GetActors()->GetNumberOfItems() == 0)
   {
-    m_TrackingRenderer->SetLayer(0); // empty
-    m_VTKRenderer->SetLayer(1);      // first
-    m_ImageRenderer->SetLayer(2);    // foreground, but transparent
+    m_TrackingRenderer->SetLayer(1); // empty
+    m_VTKRenderer->SetLayer(2);      // first
+    m_ImageRenderer->SetLayer(3);    // foreground, but transparent
   }
   else
   {
     m_VTKRenderer->SetLayer(1);      // models first
     m_TrackingRenderer->SetLayer(2); // tracking glyphs on top
-    m_ImageRenderer->SetLayer(0);    // foreground, but transparent
+    m_ImageRenderer->SetLayer(3);    // foreground, but transparent
   }
 }
 
