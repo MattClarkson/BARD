@@ -20,7 +20,7 @@ namespace bard {
 
 /**
  * \class ModelData
- * \brief Value type to hold point ID and a 3D point.
+ * \brief Value type to hold centre point, 4 additional (corner) points [0-3] and point ID.
  */
 class ModelData {
 
@@ -28,9 +28,16 @@ public:
 
   ModelData();
   ModelData(const ModelData& another);
-  ModelData(const int& pointId, const cv::Point3d modelPoint);
+  ModelData(const int& pointId,
+          const cv::Point3f centrePoint,
+          const cv::Point3f cornerPoint0,
+          const cv::Point3f cornerPoint1,
+          const cv::Point3f cornerPoint2,
+          const cv::Point3f cornerPoint3
+          );
   ~ModelData();
   ModelData& operator=(const ModelData& another);
+
 
   /**
    * \brief Returns the pointID, which is normally derived from the tag barcode.
@@ -41,14 +48,25 @@ public:
   int GetPointId() const;
 
   /**
-   * \brief Return point location.
+   * \brief Return the centre of the tag, normally used as the tag 'location'.
    */
-  cv::Point3d GetPoint() const;
+  cv::Point3f GetCentrePoint() const;
 
   /**
-   * \brief Enables external clients to update the point.
+   * \brief Enables external clients to update this centre point.
    */
-  void SetPoint(const cv::Point3d& point);
+  void SetCentrePoint(const cv::Point3f& point);
+
+  /**
+   * \brief Returns the stored corner point.
+   * \param cornerPointId integer between 0 and 3 inclusive.
+   */
+  cv::Point3f GetCornerPoint(const int cornerPointId) const;
+
+  /**
+   * \brief Sets the corner point.
+   */
+  void SetCornerPoint(const int cornerPointId, const cv::Point3f& cornerPoint);
 
 private:
 
@@ -58,7 +76,8 @@ private:
   void CopyData(const bard::ModelData& another);
 
   int          m_PointID;
-  cv::Point3d  m_Point;
+  cv::Point3f  m_CentrePoint;
+  cv::Point3f  m_Corners[4];
 
 }; // end class
 

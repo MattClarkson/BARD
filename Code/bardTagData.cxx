@@ -74,11 +74,11 @@ void TagData::CopyData(const TagData& another)
 
 //-----------------------------------------------------------------------------
 TagData::TagData(const int& pointId,
-        const cv::Point2d centrePoint,
-        const cv::Point2d cornerPoint0,
-        const cv::Point2d cornerPoint1,
-        const cv::Point2d cornerPoint2,
-        const cv::Point2d cornerPoint3
+        const cv::Point2f centrePoint,
+        const cv::Point2f cornerPoint0,
+        const cv::Point2f cornerPoint1,
+        const cv::Point2f cornerPoint2,
+        const cv::Point2f cornerPoint3
         )
 {
   m_PointID = pointId;
@@ -102,21 +102,21 @@ int TagData::GetPointId() const
 
 
 //-----------------------------------------------------------------------------
-cv::Point2d TagData::GetCentrePoint() const
+cv::Point2f TagData::GetCentrePoint() const
 {
   return m_CentrePoint;
 }
 
 
 //-----------------------------------------------------------------------------
-void TagData::SetCentrePoint(const cv::Point2d& point)
+void TagData::SetCentrePoint(const cv::Point2f& point)
 {
   m_CentrePoint = point;
 }
 
 
 //-----------------------------------------------------------------------------
-cv::Point2d TagData::GetCornerPoint(const int cornerPointId) const
+cv::Point2f TagData::GetCornerPoint(const int cornerPointId) const
 {
   assert(cornerPointId >= 0);
   assert(cornerPointId <= 3);
@@ -125,7 +125,7 @@ cv::Point2d TagData::GetCornerPoint(const int cornerPointId) const
 
 
 //-----------------------------------------------------------------------------
-void TagData::SetCornerPoint(const int cornerPointId, const cv::Point2d& cornerPoint)
+void TagData::SetCornerPoint(const int cornerPointId, const cv::Point2f& cornerPoint)
 {
   assert(cornerPointId >= 0);
   assert(cornerPointId <= 3);

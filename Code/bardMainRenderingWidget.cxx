@@ -456,7 +456,7 @@ void MainRenderingWidget::OnTimerTriggered()
               {
                 if (trackingModel[j].GetPointId() == 999)
                 {
-                  cv::Point3d point = trackingModel[j].GetPoint();
+                  cv::Point3d point = trackingModel[j].GetCentrePoint();
                   this->WritePoint(i, *modelToWorld, point);
                 }
               } // end for each point in chosen tracking model

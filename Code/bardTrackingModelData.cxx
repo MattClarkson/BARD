@@ -36,16 +36,23 @@ TrackingModelData::TrackingModelData(const std::string& fileName)
   }
   // basically read in a bunch of points: int float float float
   int pointId;
-  cv::Point3d point;
+  cv::Point3f centrePoint;
+  cv::Point3f cornerPoints[4];
   while (!ifs.eof())
   {
     ifs >> pointId;
-    ifs >> point.x;
-    ifs >> point.y;
-    ifs >> point.z;
+    ifs >> centrePoint.x;
+    ifs >> centrePoint.y;
+    ifs >> centrePoint.z;
+    for (int i = 0; i < 4; i++)
+    {
+      ifs >> cornerPoints[i].x;
+      ifs >> cornerPoints[i].y;
+      ifs >> cornerPoints[i].z;
+    }
     if (ifs.good())
     {
-      ModelData modelPoint(pointId, point);
+      ModelData modelPoint(pointId, centrePoint, cornerPoints[0], cornerPoints[1], cornerPoints[2], cornerPoints[3]);
       m_ModelPoints.push_back(modelPoint);
     }
   }
@@ -54,7 +61,7 @@ TrackingModelData::TrackingModelData(const std::string& fileName)
   m_Points->SetNumberOfPoints(m_ModelPoints.size());
   for (unsigned int i = 0; i < m_ModelPoints.size(); i++)
   {
-    cv::Point3d p = m_ModelPoints[i].GetPoint();
+    cv::Point3f p = m_ModelPoints[i].GetCentrePoint();
     m_Points->SetPoint(i, p.x, p.y, p.z);
   }
 
