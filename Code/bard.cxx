@@ -34,7 +34,8 @@ int main(int argc, char** argv)
     TCLAP::ValueArg<std::string> worldRefArg("w","world","File containing (nx4) points of a tracker board defining world coordinates.",true,"","string");
     TCLAP::ValueArg<std::string> pointerRefArg("p","pointer","File containing (nx4) points of a tracker board defining pointer coordinates.",false,"","string");
     TCLAP::ValueArg<std::string> modelArg("m","model","vtkPolyData file a model to be rendered in the scene.",false,"","string");
-    TCLAP::ValueArg<std::string> outputDirArg("d", "directory", "Output directory to dump files", false, "", "string");
+    TCLAP::ValueArg<std::string> outputDirArg("d", "directory", "Output directory to dump files.", false, "", "string");
+    TCLAP::ValueArg<std::string> modelAlignArg("a", "align", "File containing (4x4) transform, to align models to world.", false, "", "string");
     TCLAP::ValueArg<float> imageOpacityArg("o","opacity","Image opacity.",false,0.5,"float");
     TCLAP::ValueArg<int> imageXSizeArg("x","xsize","xsize when calibrating.",true,1,"int");
     TCLAP::ValueArg<int> imageYSizeArg("y","ysize","ysize when calibrating.",true,1,"int");
@@ -47,6 +48,7 @@ int main(int argc, char** argv)
     cmd.add( pointerRefArg );
     cmd.add( modelArg );
     cmd.add( outputDirArg );
+    cmd.add( modelAlignArg );
     cmd.add( imageOpacityArg );
     cmd.add( imageXSizeArg );
     cmd.add( imageYSizeArg );
@@ -60,6 +62,7 @@ int main(int argc, char** argv)
     std::string pointerRef = pointerRefArg.getValue();
     std::string modelFile = modelArg.getValue();
     std::string outputDir = outputDirArg.getValue();
+    std::string modelAlignFile = modelAlignArg.getValue();
     float opacity = imageOpacityArg.getValue();
     int xSize = imageXSizeArg.getValue();
     int ySize = imageYSizeArg.getValue();
@@ -101,6 +104,7 @@ int main(int argc, char** argv)
     myWidget.SetImageOpacity(opacity);
     myWidget.SetOutputDirectory(outputDir);
 
+    // Load intrinsic/distortion parameters
     cv::Matx33d intrinsicParameters;
     cv::Matx14d distortionParameters;
     if (intrinsicsFile.size() > 0)
@@ -127,6 +131,32 @@ int main(int argc, char** argv)
       myWidget.SetCameraIntrinsics(intrinsicParameters);
     }
 
+    // Loads 4x4 registration matrix.
+    cv::Matx44d registerModelsToWorld;
+    if (modelAlignFile.size() > 0)
+    {
+      std::ifstream ifs(modelAlignFile);
+      if (!ifs.is_open())
+      {
+        throw std::runtime_error("Failed to open registration file.");
+      }
+      for (int i = 0; i < 4; i++)
+      {
+        for (int j = 0; j < 4; j++)
+        {
+          double tmp;
+          ifs >> tmp;
+          registerModelsToWorld(i, j) = tmp;
+        }
+      }
+      if (!ifs.good())
+      {
+        throw std::runtime_error("Failed to read registration file.");
+      }
+      myWidget.SetModelsToWorld(registerModelsToWorld);
+    }
+
+    // Adds data-files that enable us to do tag tracking of various objects.
     myWidget.AddTrackingModel(&myWorldTrackingModel);
     bard::TrackingModelData* pointerTrackingModel = NULL;
     if (pointerRef.size() > 0)
@@ -134,6 +164,8 @@ int main(int argc, char** argv)
       pointerTrackingModel = new bard::TrackingModelData(pointerRef);
       myWidget.AddTrackingModel(pointerTrackingModel);
     }
+
+    // Add VTK files that enable us to visualise virtual objects in scene.
     bard::VTKModelPipeline *modelForVisualisation = NULL;
     if (modelFile.size() > 0)
     {

@@ -95,6 +95,9 @@ MainRenderingWidget::MainRenderingWidget()
   m_CameraToWorldTransform = vtkSmartPointer<vtkMatrix4x4>::New();
   m_CameraToWorldTransform->Identity();
 
+  m_ModelToWorldTransform = vtkSmartPointer<vtkMatrix4x4>::New();
+  m_ModelToWorldTransform->Identity();
+
 #ifdef WIN32
   m_PathSeparator = "\";
 #else
@@ -137,6 +140,19 @@ void MainRenderingWidget::SetCalibratedImageSize(const cv::Point2i& imageSize)
   m_CalibratedImageSize = imageSize;
   m_VTKCalibratedCamera->SetCalibratedImageSize(m_CalibratedImageSize.x, m_CalibratedImageSize.y);
   m_TrackingCalibratedCamera->SetCalibratedImageSize(m_CalibratedImageSize.x, m_CalibratedImageSize.y);
+}
+
+
+//-----------------------------------------------------------------------------
+void MainRenderingWidget::SetModelsToWorld(const cv::Matx44d& modelToWorld)
+{
+  for (int r = 0; r < 4; r++)
+  {
+    for (int c = 0; c < 4; c++)
+    {
+      this->m_ModelToWorldTransform->SetElement(r, c, modelToWorld(r, c));
+    }
+  }
 }
 
 
@@ -440,6 +456,7 @@ float MainRenderingWidget::GetImageOpacity() const
 //-----------------------------------------------------------------------------
 void MainRenderingWidget::OnTimerTriggered()
 {
+  // Reset these so that window is correctly calibrated if resized.
   m_VTKCalibratedCamera->SetActualWindowSize(this->width(), this->height());
   m_TrackingCalibratedCamera->SetActualWindowSize(this->width(), this->height());
 
@@ -471,6 +488,9 @@ void MainRenderingWidget::OnTimerTriggered()
             vtkSmartPointer<vtkMatrix4x4> modelToWorld = vtkSmartPointer<vtkMatrix4x4>::New();
             vtkMatrix4x4::Multiply4x4(m_CameraToWorldTransform, modelToCamera, modelToWorld);
 
+            // This is to transform the actor into world coordinates (defined by the first tracked obejct).
+            m_TrackingModels[i]->GetActor()->SetUserMatrix(modelToWorld);
+
             if (m_RecordMatrix)
             {
               this->WriteMatrix(i, *modelToWorld);
@@ -497,6 +517,13 @@ void MainRenderingWidget::OnTimerTriggered()
 
       this->SetImageCameraToFaceImage();
     }
+  }
+
+  // Make sure all VTK models are transformed by model to world.
+  // i.e. this is a pre-loaded registration matrix for all VTK models.
+  for (int i = 0; i < m_VTKModels.size(); i++)
+  {
+    m_VTKModels[i]->GetActor()->SetUserMatrix(m_ModelToWorldTransform);
   }
   this->GetRenderWindow()->Render();
 }

@@ -47,7 +47,7 @@ public:
 
   void SetCameraIntrinsics(const cv::Matx33d& intrinsics);
   void SetCalibratedImageSize(const cv::Point2i& imageSize);
-
+  void SetModelsToWorld(const cv::Matx44d& modelToWorld);
   void SetOutputDirectory(const std::string& output);
   void SetRecordMatrix(bool doRecord);
   void SetRecordPointOfInterest(bool doRecord);
@@ -120,6 +120,7 @@ private:
   vtkSmartPointer<vtkRenderer>         m_TrackingRenderer;
   vtkSmartPointer<vtkMatrix4x4>        m_WorldToCameraTransform;
   vtkSmartPointer<vtkMatrix4x4>        m_CameraToWorldTransform;
+  vtkSmartPointer<vtkMatrix4x4>        m_ModelToWorldTransform;
   std::string                          m_OutputDirectory;
   bool                                 m_RecordMatrix;
   bool                                 m_RecordPointOfInterest;
