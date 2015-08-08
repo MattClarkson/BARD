@@ -72,7 +72,7 @@ public:
    * \param cy centre of projection in y axis.
    */
   void SetIntrinsicParameters(const double& fx, const double& fy,
-                              const double &cx, const double& cy);
+                              const double& cx, const double& cy);
 
   /**
    * \brief Sets the pose of the camera from the matrix.

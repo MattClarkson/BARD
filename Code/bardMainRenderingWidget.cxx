@@ -34,7 +34,8 @@ MainRenderingWidget::MainRenderingWidget()
 , m_ImageRenderer(NULL)
 , m_VTKRenderer(NULL)
 , m_TrackingRenderer(NULL)
-, m_CalibratedCamera(NULL)
+, m_TrackingCalibratedCamera(NULL)
+, m_VTKCalibratedCamera(NULL)
 , m_WorldToCameraTransform(NULL)
 , m_CameraToWorldTransform(NULL)
 , m_OutputDirectory("")
@@ -60,6 +61,7 @@ MainRenderingWidget::MainRenderingWidget()
   m_ImageRenderer = vtkSmartPointer<vtkRenderer>::New();
   m_ImageRenderer->InteractiveOff();
   m_ImageRenderer->SetLayer(0);
+  m_ImageRenderer->PreserveDepthBufferOn();
   this->GetRenderWindow()->AddRenderer(m_ImageRenderer);
 
   m_VTKRenderer = vtkSmartPointer<vtkRenderer>::New();
@@ -72,10 +74,13 @@ MainRenderingWidget::MainRenderingWidget()
   m_TrackingRenderer->SetLayer(2);
   this->GetRenderWindow()->AddRenderer(m_TrackingRenderer);
 
-  m_CalibratedCamera = vtkSmartPointer<CalibratedCamera>::New();
-  m_CalibratedCamera->SetUseCalibratedCamera(false);
-  m_VTKRenderer->SetActiveCamera(m_CalibratedCamera);
-  m_TrackingRenderer->SetActiveCamera(m_CalibratedCamera);
+  m_TrackingCalibratedCamera = vtkSmartPointer<CalibratedCamera>::New();
+  m_TrackingCalibratedCamera->SetUseCalibratedCamera(false);
+  m_TrackingRenderer->SetActiveCamera(m_TrackingCalibratedCamera);
+
+  m_VTKCalibratedCamera = vtkSmartPointer<CalibratedCamera>::New();
+  m_VTKCalibratedCamera->SetUseCalibratedCamera(false);
+  m_VTKRenderer->SetActiveCamera(m_VTKCalibratedCamera);
 
   m_WorldToCameraTransform = vtkSmartPointer<vtkMatrix4x4>::New();
   m_WorldToCameraTransform->Identity();
@@ -88,6 +93,8 @@ MainRenderingWidget::MainRenderingWidget()
 #else
   m_PathSeparator = "/";
 #endif
+
+  this->GetRenderWindow()->GetInteractor()->Disable();
 }
 
 
@@ -106,8 +113,10 @@ MainRenderingWidget::~MainRenderingWidget()
 void MainRenderingWidget::SetCameraIntrinsics(const cv::Matx33d& intrinsics)
 {
   m_Intrinsics = intrinsics;
-  m_CalibratedCamera->SetIntrinsicParameters(intrinsics(0,0), intrinsics(1,1), intrinsics(0,2), intrinsics(1,2));
-  m_CalibratedCamera->SetUseCalibratedCamera(true);
+  m_TrackingCalibratedCamera->SetIntrinsicParameters(intrinsics(0,0), intrinsics(1,1), intrinsics(0,2), intrinsics(1,2));
+  m_TrackingCalibratedCamera->SetUseCalibratedCamera(true);
+  m_VTKCalibratedCamera->SetIntrinsicParameters(intrinsics(0,0), intrinsics(1,1), intrinsics(0,2), intrinsics(1,2));
+  m_VTKCalibratedCamera->SetUseCalibratedCamera(true);
 }
 
 
@@ -115,6 +124,8 @@ void MainRenderingWidget::SetCameraIntrinsics(const cv::Matx33d& intrinsics)
 void MainRenderingWidget::SetCalibratedImageSize(const cv::Point2i& imageSize)
 {
   m_CalibratedImageSize = imageSize;
+  m_VTKCalibratedCamera->SetCalibratedImageSize(m_CalibratedImageSize.x, m_CalibratedImageSize.y);
+  m_TrackingCalibratedCamera->SetCalibratedImageSize(m_CalibratedImageSize.x, m_CalibratedImageSize.y);
 }
 
 
@@ -187,9 +198,9 @@ void MainRenderingWidget::UpdateLayers()
   }
   else
   {
-    m_VTKRenderer->SetLayer(0);      // models first
-    m_TrackingRenderer->SetLayer(1); // tracking glyphs on top
-    m_ImageRenderer->SetLayer(2);    // foreground, but transparent
+    m_VTKRenderer->SetLayer(1);      // models first
+    m_TrackingRenderer->SetLayer(2); // tracking glyphs on top
+    m_ImageRenderer->SetLayer(0);    // foreground, but transparent
   }
 }
 
@@ -418,6 +429,9 @@ float MainRenderingWidget::GetImageOpacity() const
 //-----------------------------------------------------------------------------
 void MainRenderingWidget::OnTimerTriggered()
 {
+  m_VTKCalibratedCamera->SetActualWindowSize(this->width(), this->height());
+  m_TrackingCalibratedCamera->SetActualWindowSize(this->width(), this->height());
+
   if (m_VideoSource != NULL)
   {
     if(m_VideoSource->GrabImage())
@@ -471,9 +485,9 @@ void MainRenderingWidget::OnTimerTriggered()
       m_ImageImporter->Update(); // this is what pulls a new image into the VTK rendering pipeline so we can visualise it.
 
       this->SetImageCameraToFaceImage();
-      this->GetRenderWindow()->Render();
     }
   }
+  this->GetRenderWindow()->Render();
 }
 
 
@@ -483,9 +497,8 @@ void MainRenderingWidget::SetWorldToCameraTransform(const vtkMatrix4x4& matrix)
   m_WorldToCameraTransform->DeepCopy(&matrix);
   m_CameraToWorldTransform->DeepCopy(m_WorldToCameraTransform);
   m_CameraToWorldTransform->Invert();
-  m_CalibratedCamera->SetActualWindowSize(this->width(), this->height());
-  m_CalibratedCamera->SetCalibratedImageSize(m_CalibratedImageSize.x, m_CalibratedImageSize.y);
-  m_CalibratedCamera->SetExtrinsicParameters(m_WorldToCameraTransform);
+  m_VTKCalibratedCamera->SetExtrinsicParameters(m_WorldToCameraTransform);
+  m_TrackingCalibratedCamera->SetExtrinsicParameters(m_WorldToCameraTransform);
 }
 
 

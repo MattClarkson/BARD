@@ -115,7 +115,8 @@ private:
   vtkSmartPointer<vtkRenderer>         m_ImageRenderer;
   vtkSmartPointer<vtkRenderer>         m_VTKRenderer;
   vtkSmartPointer<vtkRenderer>         m_TrackingRenderer;
-  vtkSmartPointer<CalibratedCamera>    m_CalibratedCamera;
+  vtkSmartPointer<CalibratedCamera>    m_TrackingCalibratedCamera;
+  vtkSmartPointer<CalibratedCamera>    m_VTKCalibratedCamera;
   vtkSmartPointer<vtkMatrix4x4>        m_WorldToCameraTransform;
   vtkSmartPointer<vtkMatrix4x4>        m_CameraToWorldTransform;
   std::string                          m_OutputDirectory;
