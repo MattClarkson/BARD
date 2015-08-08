@@ -84,8 +84,25 @@ void CalibratedCamera::SetIntrinsicParameters(const double& fx, const double& fy
 //----------------------------------------------------------------------------
 void CalibratedCamera::SetExtrinsicParameters(vtkSmartPointer<vtkMatrix4x4> matrix)
 {
-  // ToDo: Set pose.
+  // This implies a right handed coordinate system.
+  // By default, assume camera position is at origin, looking down the world z-axis.
+  double origin[4]     = {0, 0,    0,    1};
+  double focalPoint[4] = {0, 0,   1000, 1};
+  double viewUp[4]     = {0, -1000, 0,    1};
 
+  matrix->MultiplyPoint(origin, origin);
+  matrix->MultiplyPoint(focalPoint, focalPoint);
+  matrix->MultiplyPoint(viewUp, viewUp);
+  viewUp[0] = viewUp[0] - origin[0];
+  viewUp[1] = viewUp[1] - origin[1];
+  viewUp[2] = viewUp[2] - origin[2];
+
+  this->SetPosition(origin[0], origin[1], origin[2]);
+  this->SetFocalPoint(focalPoint[0], focalPoint[1], focalPoint[2]);
+  this->SetViewUp(viewUp[0], viewUp[1], viewUp[2]);
+  this->SetClippingRange(0, 10000);
+
+  std::cerr << "Matt, camera posn:" << origin[0] << ", " << origin[1] << ", " << origin[2] << std::endl;
   this->Modified();
 }
 
