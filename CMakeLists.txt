@@ -187,6 +187,11 @@ list(APPEND ALL_LIBS ${aruco_LIBS} ${OpenCV_LIBS} ${VTK_LIBRARIES})
 # Output directories, for when compiling, not installing.
 ######################################################################
 
+configure_file(${CMAKE_SOURCE_DIR}/Doc/Doxygen/bardgroup.pl ${CMAKE_BINARY_DIR}/bardgroup.pl @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/Doc/Doxygen/vxl_doxy.pl ${CMAKE_BINARY_DIR}/vxl_doxy.pl @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/Doc/Doxygen/barddoxygen.pl.in ${CMAKE_BINARY_DIR}/barddoxygen.pl)
+configure_file(${CMAKE_SOURCE_DIR}/Doc/Doxygen/doxygen.config.in ${CMAKE_BINARY_DIR}/doxygen.config)
+
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 set(CXX_TEST_PATH ${EXECUTABLE_OUTPUT_PATH})              # Used to control, where to put unit test binaries.
 set(BASELINE ${BARD_DATA_DIR}/Baseline)
