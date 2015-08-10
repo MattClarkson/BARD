@@ -102,8 +102,6 @@ MainRenderingWidget::MainRenderingWidget()
 #else
   m_PathSeparator = "/";
 #endif
-
-  this->GetRenderWindow()->GetInteractor()->Disable();
 }
 
 
@@ -475,6 +473,8 @@ void MainRenderingWidget::OnTimerTriggered()
         {
           vtkSmartPointer<vtkMatrix4x4> matrix = m_RegistrationAlgorithm->DoRegistration(m_Intrinsics, m_TrackingModels[0]->GetTrackingModel(), tags);
           this->SetWorldToCameraTransform(*matrix);
+
+          std::cerr << "Matt, translation = " << matrix->GetElement(0, 3) << " " << matrix->GetElement(1, 3) << ", " << matrix->GetElement(2, 3) << std::endl;
         }
 
         // If there are any more tracking models, they use the first tracking model as a reference.
@@ -534,8 +534,8 @@ void MainRenderingWidget::SetWorldToCameraTransform(const vtkMatrix4x4& matrix)
   m_WorldToCameraTransform->DeepCopy(&matrix);
   m_CameraToWorldTransform->DeepCopy(m_WorldToCameraTransform);
   m_CameraToWorldTransform->Invert();
-  m_VTKCalibratedCamera->SetExtrinsicParameters(m_WorldToCameraTransform);
-  m_TrackingCalibratedCamera->SetExtrinsicParameters(m_WorldToCameraTransform);
+  m_VTKCalibratedCamera->SetExtrinsicParameters(m_CameraToWorldTransform);
+  m_TrackingCalibratedCamera->SetExtrinsicParameters(m_CameraToWorldTransform);
 }
 
 

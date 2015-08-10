@@ -177,6 +177,7 @@ int main(int argc, char** argv)
     mainWin.setCentralWidget(&myWidget);
     mainWin.show();
 
+    myWidget.GetInteractor()->Disable();
     myWidget.SetEnableImage(true);
     myWidget.SetEnableTrackingModels(true);
     myWidget.SetEnableVTKModels(true);

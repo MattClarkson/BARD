@@ -70,7 +70,7 @@ TrackingModelData::TrackingModelData(const std::string& fileName)
   m_PolyData->SetPoints(m_Points);
 
   m_SphereSource = vtkSmartPointer<vtkSphereSource>::New();
-  m_SphereSource->SetRadius(0.5);
+  m_SphereSource->SetRadius(10);
 
   m_Glyph3D = vtkSmartPointer<vtkGlyph3D>::New();
   m_Glyph3D->SetInputData(m_PolyData);
