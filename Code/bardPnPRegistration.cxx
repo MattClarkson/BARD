@@ -29,14 +29,13 @@ PnPRegistration::~PnPRegistration()
 
 
 //-----------------------------------------------------------------------------
-vtkSmartPointer<vtkMatrix4x4> PnPRegistration::DoRegistration(
+bool PnPRegistration::DoRegistration(
       const cv::Matx33d& intrinsics,
       const std::vector<ModelData>& model,
-      const std::vector<TagData>& tags)
+      const std::vector<TagData>& tags,
+      vtkMatrix4x4& outputMatrix
+    )
 {
-  vtkSmartPointer<vtkMatrix4x4> pose = vtkSmartPointer<vtkMatrix4x4>::New();
-  pose->Identity();
-
   // Collect tag points that have been detected in image and are present in this model.
   std::vector<cv::Point3f> points3D;
   std::vector<cv::Point2f> points2D;
@@ -63,7 +62,7 @@ vtkSmartPointer<vtkMatrix4x4> PnPRegistration::DoRegistration(
   // If no points matched, abandon.
   if (points2D.size() == 0 || points3D.size() == 0)
   {
-    return pose;
+    return false;
   }
 
   // Now solve 2D/3D registration.
@@ -84,15 +83,16 @@ vtkSmartPointer<vtkMatrix4x4> PnPRegistration::DoRegistration(
   cv::Rodrigues(rvec, rotationMatrix);
 
   // Convert to VTK matrix.
+  outputMatrix.Identity();
   for (int i = 0; i < 3; i++)
   {
     for (int j = 0; j < 3; j++)
     {
-      pose->SetElement(i, j, rotationMatrix.at<double>(i,j));
+      outputMatrix.SetElement(i, j, rotationMatrix.at<double>(i,j));
     }
-    pose->SetElement(i, 3, tvec.at<double>(i, 0));
+    outputMatrix.SetElement(i, 3, tvec.at<double>(i, 0));
   }
-  return pose;
+  return true;
 }
 
 } // end namespace

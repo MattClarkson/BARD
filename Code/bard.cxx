@@ -103,6 +103,8 @@ int main(int argc, char** argv)
     myWidget.SetRegistrationAlgorithm(&myRegistration);
     myWidget.SetImageOpacity(opacity);
     myWidget.SetOutputDirectory(outputDir);
+    myWidget.SetRecordMatrix(pointerRecordMatrix);
+    myWidget.SetRecordPointOfInterest(pointerRecordTip);
 
     // Load intrinsic/distortion parameters
     cv::Matx33d intrinsicParameters;

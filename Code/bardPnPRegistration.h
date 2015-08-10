@@ -33,10 +33,12 @@ public:
   /**
   * \brief Takes 3D points and 2D points, and computes a pose matrix.
   */
-  virtual vtkSmartPointer<vtkMatrix4x4> DoRegistration(
+  virtual bool DoRegistration(
       const cv::Matx33d& intrinsics,
       const std::vector<ModelData>& model,
-      const std::vector<TagData>& tags);
+      const std::vector<TagData>& tags,
+      vtkMatrix4x4& outputMatrix
+      );
 };
 
 } // end namespace

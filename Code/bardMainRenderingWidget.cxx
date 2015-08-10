@@ -461,6 +461,7 @@ void MainRenderingWidget::OnTimerTriggered()
   {
     if(m_VideoSource->GrabImage())
     {
+      bool successTrackingReference = false;
       if (m_TagProcessor != NULL)
       {
         std::vector<TagData> tags = m_TagProcessor->GetTags(*(m_VideoSource->ExposeOpenCVImage()));
@@ -471,8 +472,12 @@ void MainRenderingWidget::OnTimerTriggered()
             m_TrackingModels[0] != NULL &&
             m_RegistrationAlgorithm != NULL)
         {
-          vtkSmartPointer<vtkMatrix4x4> matrix = m_RegistrationAlgorithm->DoRegistration(m_Intrinsics, m_TrackingModels[0]->GetTrackingModel(), tags);
-          this->SetWorldToCameraTransform(*matrix);
+          vtkSmartPointer<vtkMatrix4x4> matrix = vtkSmartPointer<vtkMatrix4x4>::New();
+          successTrackingReference = m_RegistrationAlgorithm->DoRegistration(m_Intrinsics, m_TrackingModels[0]->GetTrackingModel(), tags, *matrix);
+          if (successTrackingReference)
+          {
+            this->SetWorldToCameraTransform(*matrix);
+          }
         }
 
         // If there are any more tracking models, they use the first tracking model as a reference.
@@ -481,37 +486,41 @@ void MainRenderingWidget::OnTimerTriggered()
           for (int i = 1; i < m_TrackingModels.size(); i++)
           {
             std::vector<ModelData> trackingModel = m_TrackingModels[i]->GetTrackingModel();
-            vtkSmartPointer<vtkMatrix4x4> modelToCamera = m_RegistrationAlgorithm->DoRegistration(m_Intrinsics, trackingModel, tags);
-            vtkSmartPointer<vtkMatrix4x4> modelToWorld = vtkSmartPointer<vtkMatrix4x4>::New();
-            vtkMatrix4x4::Multiply4x4(m_CameraToWorldTransform, modelToCamera, modelToWorld);
+            vtkSmartPointer<vtkMatrix4x4> modelToCamera = vtkSmartPointer<vtkMatrix4x4>::New();
 
-            // This is to transform the actor into world coordinates (defined by the first tracked obejct).
-            m_TrackingModels[i]->GetActor()->SetUserMatrix(modelToWorld);
+            bool successTrackingAnotherObject = false;
+            successTrackingAnotherObject = m_RegistrationAlgorithm->DoRegistration(m_Intrinsics, trackingModel, tags, *modelToCamera);
 
-            if (m_RecordMatrix)
+            if (successTrackingAnotherObject)
             {
-              this->WriteMatrix(i, *modelToWorld);
-            }
-            if (m_RecordPointOfInterest)
-            {
-              for (int j = 0; j < trackingModel.size(); j++)
+              vtkSmartPointer<vtkMatrix4x4> modelToWorld = vtkSmartPointer<vtkMatrix4x4>::New();
+              vtkMatrix4x4::Multiply4x4(m_CameraToWorldTransform, modelToCamera, modelToWorld);
+
+              // This is to transform the actor into world coordinates (defined by the first tracked obejct).
+              m_TrackingModels[i]->GetActor()->SetUserMatrix(modelToWorld);
+
+              if (m_RecordMatrix)
               {
-                if (trackingModel[j].GetPointId() == 999)
+                this->WriteMatrix(i, *modelToWorld);
+              }
+              if (m_RecordPointOfInterest)
+              {
+                for (int j = 0; j < trackingModel.size(); j++)
                 {
-                  cv::Point3d point = trackingModel[j].GetCentrePoint();
-                  this->WritePoint(i, *modelToWorld, point);
-                }
-              } // end for each point in chosen tracking model
-            } // end if recording points of interest
+                  if (trackingModel[j].GetPointId() == 9999)
+                  {
+                    cv::Point3d point = trackingModel[j].GetCentrePoint();
+                    this->WritePoint(i, *modelToWorld, point);
+                  }
+                } // end for each point in chosen tracking model
+              } // end if recording points of interest
+            } // end if successfully tracked
           } // end for each non-reference tracking model
-
-          m_FrameCounter++;
-
         } // end if we have non-reference tracking models
       }
       m_ImageImporter->Modified();
       m_ImageImporter->Update(); // this is what pulls a new image into the VTK rendering pipeline so we can visualise it.
-
+      m_FrameCounter++;
       this->SetImageCameraToFaceImage();
     }
   }
