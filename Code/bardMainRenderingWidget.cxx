@@ -473,8 +473,6 @@ void MainRenderingWidget::OnTimerTriggered()
         {
           vtkSmartPointer<vtkMatrix4x4> matrix = m_RegistrationAlgorithm->DoRegistration(m_Intrinsics, m_TrackingModels[0]->GetTrackingModel(), tags);
           this->SetWorldToCameraTransform(*matrix);
-
-          std::cerr << "Matt, translation = " << matrix->GetElement(0, 3) << " " << matrix->GetElement(1, 3) << ", " << matrix->GetElement(2, 3) << std::endl;
         }
 
         // If there are any more tracking models, they use the first tracking model as a reference.

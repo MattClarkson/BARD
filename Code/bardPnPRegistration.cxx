@@ -60,6 +60,12 @@ vtkSmartPointer<vtkMatrix4x4> PnPRegistration::DoRegistration(
     }
   }
 
+  // If no points matched, abandon.
+  if (points2D.size() == 0 || points3D.size() == 0)
+  {
+    return pose;
+  }
+
   // Now solve 2D/3D registration.
   cv::Mat cameraMatrix(intrinsics);
 
