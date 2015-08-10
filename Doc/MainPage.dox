@@ -1,0 +1,47 @@
+/**
+\mainpage The BARD Documentation
+
+This project was built for the MediCSS summer school 2015.
+
+The aim was to demo some features of VTK, OpenCV and ArUco.
+
+\section BARDFeatures Features
+
+<ul>
+  <li>```bardGrabber``` uses OpenCV video source to grab a single frame and save to file. For now, camera calibration should be done externally.</li>
+  <li>```bard``` performs the following:
+    <ul>
+      <li>launches a single QVTKWidget</li>
+      <li>creates an OpenCV VideoSource (e.g. from webcam).</li>
+      <li>displays semi-transparent video in foreground vtkRenderer</li>
+      <li>overlays vtkPolyData</li>
+      <li>loads references models (3D coordinates and point ID) of ArUco boards.</li>
+      <li>uses ArUco/OpenCV to track ArUco boards</li>
+      <li>provides a modified VTK camera that uses the calibrated intrinsic parameters</li>
+      <li>moves the VTK camera according to a registration transformation from 3D reference model coordinates to 2D coordinates of ArUco markers</li>
+      <li>tracks a single pointer, made using a separate ArUco marker</li>
+    </ul>
+  </li>
+</ul>
+
+\section BARDBuild Build Instructions
+
+Currently tested on Mac OSX 10.10.4, using Xcode 6.1, Qt 4.8.7, CMake 3.1.2
+
+\verbatim
+git clone https://github.com/MattClarkson/BARD.git
+mkdir BARD-SuperBuild-Debug
+cd BARD-SuperBuild-Debug
+ccmake ../BARD
+make
+\endverbatim
+
+\section BARDFuture Future Plans
+
+\li Command line app to calibrate mono camera using OpenCV standard routines.
+\li Command line app to do Procrustes analysis to register VTK models to world coordinates.
+\li Command line app to do Pivot Calibration to make a pointer.
+
+(As of Aug 2015, these 3 apps were done using existing software, eg. NifTK))
+
+*/
