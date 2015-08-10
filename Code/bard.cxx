@@ -174,7 +174,7 @@ int main(int argc, char** argv)
     }
 
     bard::MainWindow mainWin;
-    mainWin.SetMainRenderingWidget(&myWidget);
+    mainWin.setCentralWidget(&myWidget);
     mainWin.show();
 
     myWidget.SetEnableImage(true);

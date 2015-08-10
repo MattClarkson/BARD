@@ -12,6 +12,7 @@
 
 ============================================================================*/
 #include "bardVTKModelPipeline.h"
+
 #include <stdexcept>
 
 namespace bard

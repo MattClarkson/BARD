@@ -12,9 +12,9 @@
 
 ============================================================================*/
 #include "bardArucoProcessor.h"
+#include "bardTagData.h"
 
 #include <aruco/aruco.h>
-#include <bardTagData.h>
 
 namespace bard
 {
@@ -96,7 +96,7 @@ std::vector<TagData> ArucoProcessor::GetTags(const cv::Mat& image) const
 {
   std::vector<TagData> results;
 
-  aruco::CameraParameters cameraParams;
+  aruco::CameraParameters cameraParams; // using default camera params, as conversion to 3D points happens elsewhere.
   aruco::MarkerDetector   detector;
 
   std::vector<aruco::Marker> markers;

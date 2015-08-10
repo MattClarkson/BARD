@@ -21,6 +21,7 @@ namespace bard {
 /**
  * \class TagData
  * \brief Value type to hold centre point, 4 additional (corner) points [0-3] and point ID.
+ * \see ModelData
  */
 class TagData {
 

@@ -29,7 +29,7 @@ int main(int argc, char** argv)
     std::string inputDir = directoryArg.getValue();
     std::string outputFile = outputArg.getValue();
 
-    // To Do. Implement camera calibration.
+    // To Do. Implement camera calibration using standard OpenCV functions.
 
     return EXIT_SUCCESS;
   }

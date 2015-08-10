@@ -14,7 +14,7 @@
 #ifndef bardTagProcessingInterface_h
 #define bardTagProcessingInterface_h
 
-#include <bardTagData.h>
+#include "bardTagData.h"
 
 namespace bard
 {

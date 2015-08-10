@@ -15,6 +15,7 @@
 #define bardOpenCVVideoSource_h
 
 #include "bardVideoSourceInterface.h"
+
 #include <highgui.h>
 
 namespace bard

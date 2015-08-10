@@ -12,6 +12,7 @@
 
 ============================================================================*/
 #include "bardTrackingModelData.h"
+
 #include <stdexcept>
 #include <iostream>
 #include <sstream>

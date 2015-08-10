@@ -29,20 +29,5 @@ MainWindow::~MainWindow()
 
 }
 
-
-//-----------------------------------------------------------------------------
-void MainWindow::Start()
-{
-  m_RenderingWidget->GetInteractor()->Start();
-}
-
-
-//-----------------------------------------------------------------------------
-void MainWindow::SetMainRenderingWidget(MainRenderingWidget* widget)
-{
-  m_RenderingWidget = widget;
-  this->setCentralWidget(m_RenderingWidget);
-}
-
 } // end namespace
 

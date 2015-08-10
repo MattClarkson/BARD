@@ -14,6 +14,12 @@
 #ifndef bardMainRenderingWidget_h
 #define bardMainRenderingWidget_h
 
+#include "bardCalibratedCamera.h"
+#include "bardTagProcessingInterface.h"
+#include "bardRegistrationInterface.h"
+#include "bardTrackingModelInterface.h"
+#include "bardVTKModelInterface.h"
+
 #include <QVTKWidget.h>
 #include <QTimer>
 #include <vtkSmartPointer.h>
@@ -21,12 +27,6 @@
 #include <vtkImageActor.h>
 #include <vtkRenderer.h>
 #include <cv.h>
-
-#include "bardCalibratedCamera.h"
-#include "bardTagProcessingInterface.h"
-#include "bardRegistrationInterface.h"
-#include "bardTrackingModelInterface.h"
-#include "bardVTKModelInterface.h"
 
 namespace bard
 {

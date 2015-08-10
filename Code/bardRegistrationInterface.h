@@ -16,6 +16,7 @@
 
 #include "bardTagData.h"
 #include "bardModelData.h"
+
 #include <vtkSmartPointer.h>
 #include <vtkMatrix4x4.h>
 #include <cv.h>

@@ -18,7 +18,6 @@
 #include <vtkRenderWindow.h>
 #include <vtkImageData.h>
 #include <vtkRendererCollection.h>
-
 #include <sstream>
 #include <ostream>
 

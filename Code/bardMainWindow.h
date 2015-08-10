@@ -24,6 +24,7 @@ class MainRenderingWidget;
 
 /**
  * \class MainWindow
+ * \brief QMainWindow subclass to join QMainWindow with .ui file.
  */
 class MainWindow : public QMainWindow, public Ui::BARDMainWindow {
 
@@ -33,11 +34,6 @@ public:
   MainWindow();
   virtual ~MainWindow();
 
-  void Start();
-  void SetMainRenderingWidget(MainRenderingWidget* widget);
-
-private:
-  MainRenderingWidget *m_RenderingWidget;
 };
 
 } // end namespace

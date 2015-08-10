@@ -11,25 +11,24 @@
   See LICENSE.txt in the top level directory for details.
 
 ============================================================================*/
+#include "bardOpenCVVideoSource.h"
 
 #include <tclap/CmdLine.h>
 #include <iostream>
 #include <cstdlib>
-
-#include <bardOpenCVVideoSource.h>
 
 int main(int argc, char** argv)
 {
   try
   {
     TCLAP::CmdLine cmd("Basic Augmented Reality Demo - Frame Grabber", ' ', "0.1");
-    TCLAP::ValueArg<std::string> imageArg("i","image","Filename to write an image to.",true,"","string");
-    cmd.add( imageArg );
+    TCLAP::ValueArg<std::string> outputArg("o","output","Filename to write an image to.",true,"","string");
+    cmd.add( outputArg );
     cmd.parse( argc, argv );
-    std::string imageFile = imageArg.getValue();
+    std::string outputFile = outputArg.getValue();
 
     bard::OpenCVVideoSource mySource("");
-    mySource.DumpImage(imageFile);
+    mySource.DumpImage(outputFile);
     return EXIT_SUCCESS;
   }
   catch (TCLAP::ArgException &e)

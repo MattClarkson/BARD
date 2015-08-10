@@ -16,6 +16,7 @@
 
 #include "bardTrackingModelInterface.h"
 #include "bardModelData.h"
+
 #include <vtkSmartPointer.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>

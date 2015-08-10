@@ -14,14 +14,14 @@
 #ifndef bardVTKModelPipeline_h
 #define bardVTKModelPipeline_h
 
+#include "bardVTKModelInterface.h"
+
 #include <vtkActor.h>
 #include <vtkSmartPointer.h>
 #include <vtkPolyDataReader.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
-
-#include "bardVTKModelInterface.h"
 
 namespace bard
 {
