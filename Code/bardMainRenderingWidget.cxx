@@ -98,7 +98,7 @@ MainRenderingWidget::MainRenderingWidget()
   m_ModelToWorldTransform->Identity();
 
 #ifdef WIN32
-  m_PathSeparator = "\";
+  m_PathSeparator = "\\";
 #else
   m_PathSeparator = "/";
 #endif
@@ -559,7 +559,7 @@ void MainRenderingWidget::WriteMatrix(int i, vtkMatrix4x4& matrix)
   std::stringstream oss;
   oss << m_OutputDirectory << m_PathSeparator << "matrix." << i << "." << m_FrameCounter << ".txt";
 
-  std::ofstream ofs(oss.str());
+  std::ofstream ofs((oss.str()).c_str());
   if (!ofs.is_open())
   {
     std::stringstream errMsg;
@@ -584,7 +584,7 @@ void MainRenderingWidget::WritePoint(int i, vtkMatrix4x4& matrix, cv::Point3d& p
   std::stringstream oss;
   oss << m_OutputDirectory << m_PathSeparator << "point." << i << "." << m_FrameCounter << ".txt";
 
-  std::ofstream ofs(oss.str());
+  std::ofstream ofs((oss.str()).c_str());
   if (!ofs.is_open())
   {
     std::stringstream errMsg;

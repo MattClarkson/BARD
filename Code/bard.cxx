@@ -109,7 +109,7 @@ int main(int argc, char** argv)
     cv::Matx14d distortionParameters;
     if (intrinsicsFile.size() > 0)
     {
-      std::ifstream ifs(intrinsicsFile);
+      std::ifstream ifs(intrinsicsFile.c_str());
       if (!ifs.is_open())
       {
         throw std::runtime_error("Failed to open intrinsics file.");
@@ -135,7 +135,7 @@ int main(int argc, char** argv)
     cv::Matx44d registerModelsToWorld;
     if (modelAlignFile.size() > 0)
     {
-      std::ifstream ifs(modelAlignFile);
+      std::ifstream ifs(modelAlignFile.c_str());
       if (!ifs.is_open())
       {
         throw std::runtime_error("Failed to open registration file.");
