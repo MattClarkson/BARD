@@ -37,7 +37,6 @@ Future Plans
 ------------
 
  * Command line app to calibrate mono camera using OpenCV standard routines.
- * Command line app to do Procrustes analysis to register VTK models to world coordinates.
  * Command line app to do Pivot Calibration to make a pointer.
 
 (As of Aug 2015, these 3 apps were done using existing software, eg. NifTK))
