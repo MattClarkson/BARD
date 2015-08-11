@@ -19,8 +19,8 @@ Features
    1. provides a modified VTK camera that uses the calibrated intrinsic parameters
    1. moves the VTK camera according to a registration transformation from 3D reference model coordinates to 2D coordinates of ArUco markers
    1. tracks a single pointer, made using a separate ArUco marker
-   1. includes pivot calibration to create a pointer object
-   1. includes Procrustes analysis to register models to world coordinates
+ 1. `bardPivotCalibration` does pivot calibration to create a pointer object. See [Feuerstein 2008](http://dx.doi.org/10.1109/TMI.2007.907327).
+ 1. `bardProcrustes` does point based registration (Procrustes analysis). See [Arun 1987](http://dx.doi.org/10.1109/TPAMI.1987.4767965).
 
 Build Instructions
 ------------------
