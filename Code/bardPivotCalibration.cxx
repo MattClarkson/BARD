@@ -19,6 +19,7 @@
 #include <strstream>
 
 #include "bardFileIO.h"
+#include "bardMaths.h"
 
 int main(int argc, char** argv)
 {
@@ -35,31 +36,32 @@ int main(int argc, char** argv)
 
     // 1. Load all matrices.
     std::vector<cv::Matx44d> matrices = bard::LoadMatricesFromFile(inputFile);
-    if (matrices.size())
+    if (matrices.size() == 0)
     {
       std::stringstream oss;
       oss << "Failed to read matrices from file:" << inputFile << std::endl;
-      throw new std::runtime_error(oss.str());
+      throw std::runtime_error(oss.str());
     }
 
     // 2. Declare stuff.
-    cv::Matx44d offset;
+    cv::Matx44d outputMatrix;
     double residual = 0;
 
     // 3. Do pivot calib.
+    residual = bard::DoPivotCalibration(matrices, outputMatrix);
 
     // 4. Output matrix.
-    bard::SaveMatrixToFile(offset, outputFile);
+    bard::SaveMatrixToFile(outputMatrix, outputFile);
 
     // 5. Finish up.
-    std::cout << "Residual=" << residual << std::endl;
+    std::cout << "Offset=" << outputMatrix(0,3) << " " << outputMatrix(1,3) << " " << outputMatrix(2,3) << std::endl;
     return EXIT_SUCCESS;
   }
   catch (TCLAP::ArgException &e)
   {
     std::cerr << "error: " << e.error() << " for arg " << e.argId() << std::endl;
   }
-  catch (std::runtime_error& e)
+  catch (std::exception& e)
   {
     std::cerr << "error: " << e.what() << std::endl;
   }

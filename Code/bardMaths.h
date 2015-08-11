@@ -45,6 +45,11 @@ bool IsCloseToZero(const double& value, const double& tolerance = 0.000001);
 void MakeIdentity(cv::Matx44d& matrix);
 
 /**
+ * \brief Does Pivot calibration.
+ */
+double DoPivotCalibration(const std::vector<cv::Matx44d>& matrices, cv::Matx44d& outputMatrix);
+
+/**
  * \brief Does SVD point based registration.
  *
  * Based on Arun's method:

@@ -25,14 +25,14 @@ std::vector<cv::Point3d> LoadPointsFromFile(const std::string& fileName)
 {
   if (fileName.size() == 0)
   {
-    throw new std::runtime_error("Empty filename supplied.");
+    throw std::runtime_error("Empty filename supplied.");
   }
   std::ifstream ifs(fileName.c_str());
   if (!ifs.is_open())
   {
     std::stringstream oss;
     oss << "Failed to open file:" << fileName << std::endl;
-    throw new std::runtime_error(oss.str());
+    throw std::runtime_error(oss.str());
   }
   cv::Point3d point;
   std::vector<cv::Point3d> points;
@@ -55,7 +55,7 @@ void SaveMatrixToFile(const cv::Matx44d& matrix, const std::string& fileName)
 {
   if (fileName.size() == 0)
   {
-    throw new std::runtime_error("Empty filename supplied.");
+    throw std::runtime_error("Empty filename supplied.");
   }
   std::ofstream ofs(fileName.c_str());
   if (!ofs.is_open())
@@ -77,7 +77,7 @@ std::vector<cv::Matx44d> LoadMatricesFromFile(const std::string& fileName)
 {
   if (fileName.size() == 0)
   {
-    throw new std::runtime_error("Empty filename supplied.");
+    throw std::runtime_error("Empty filename supplied.");
   }
   std::ifstream ifs(fileName.c_str());
   if (!ifs.is_open())
@@ -127,7 +127,7 @@ void LoadCameraParameters(const std::string fileName, cv::Matx33d& intrinsicPara
 {
   if (fileName.size() == 0)
   {
-    throw new std::runtime_error("Empty filename supplied.");
+    throw std::runtime_error("Empty filename supplied.");
   }
   std::ifstream ifs(fileName.c_str());
   if (!ifs.is_open())

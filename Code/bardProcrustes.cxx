@@ -51,7 +51,7 @@ int main(int argc, char** argv)
     {
       std::stringstream oss;
       oss << "There are " << fixedPoints.size() << " fixed points and " << movingPoints.size() << " moving points, whereas there should be an equal number of fixed and moving points.";
-      throw new std::runtime_error(oss.str());
+      throw std::runtime_error(oss.str());
     }
 
     // 1. Calculate centroid.
@@ -80,7 +80,7 @@ int main(int argc, char** argv)
   {
     std::cerr << "error: " << e.error() << " for arg " << e.argId() << std::endl;
   }
-  catch (std::runtime_error& e)
+  catch (std::exception& e)
   {
     std::cerr << "error: " << e.what() << std::endl;
   }

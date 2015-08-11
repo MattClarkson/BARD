@@ -233,4 +233,93 @@ double CalculateFiducialRegistrationError(const std::vector<cv::Point3d>& fixedP
   return fre;
 }
 
+
+//-----------------------------------------------------------------------------
+double DoPivotCalibration(const std::vector<cv::Matx44d>& matrices, cv::Matx44d& outputMatrix)
+{
+  // See: Feuerstein et. al. Intraoperative Laparoscope Augmentation
+  // for Port Placement and Resection Planning. IEEE TMI Vol 27, No 3. March 2008.
+  // This is very basic. Will eventually run out of memory.
+
+  unsigned long int numberOfMatrices = matrices.size();
+
+  cv::Mat a = cvCreateMat(3*numberOfMatrices, 6,CV_64FC1);
+  cv::Mat x = cvCreateMat(6, 1,CV_64FC1);
+  cv::Mat b = cvCreateMat(3*numberOfMatrices, 1,CV_64FC1);
+
+  // Fill matrices.
+  for (unsigned long int i = 0; i < numberOfMatrices; i++)
+  {
+    b.at<double>(i * 3 + 0, 0) = -1 * matrices[i](0, 3);
+    b.at<double>(i * 3 + 1, 0) = -1 * matrices[i](1, 3);
+    b.at<double>(i * 3 + 2, 0) = -1 * matrices[i](2, 3);
+
+    a.at<double>(i * 3 + 0, 0) = matrices[i](0, 0);
+    a.at<double>(i * 3 + 1, 0) = matrices[i](1, 0);
+    a.at<double>(i * 3 + 2, 0) = matrices[i](2, 0);
+    a.at<double>(i * 3 + 0, 1) = matrices[i](0, 1);
+    a.at<double>(i * 3 + 1, 1) = matrices[i](1, 1);
+    a.at<double>(i * 3 + 2, 1) = matrices[i](2, 1);
+    a.at<double>(i * 3 + 0, 2) = matrices[i](0, 2);
+    a.at<double>(i * 3 + 1, 2) = matrices[i](1, 2);
+    a.at<double>(i * 3 + 2, 2) = matrices[i](2, 2);
+
+    a.at<double>(i * 3 + 0, 3) = -1;
+    a.at<double>(i * 3 + 1, 3) =  0;
+    a.at<double>(i * 3 + 2, 3) =  0;
+    a.at<double>(i * 3 + 0, 4) =  0;
+    a.at<double>(i * 3 + 1, 4) = -1;
+    a.at<double>(i * 3 + 2, 4) =  0;
+    a.at<double>(i * 3 + 0, 5) =  0;
+    a.at<double>(i * 3 + 1, 5) =  0;
+    a.at<double>(i * 3 + 2, 5) = -1;
+
+  }
+
+  cv::SVD svdOfA(a);
+
+  // Zero out diagonal values less than threshold
+  int rank = 0;
+  for (long int i = 0; i < svdOfA.w.rows; i++)
+  {
+    if (svdOfA.w.at<double>(i, 0) < 0.01)
+    {
+      svdOfA.w.at<double>(i, 0) = 0;
+    }
+
+    if (svdOfA.w.at<double>(i, 0) != 0)
+    {
+      rank++;
+    }
+  }
+
+  if (rank < 6)
+  {
+    std::ostringstream oss;
+    oss << "PivotCalibration: Failed. Rank < 6" << std::endl;
+    throw std::logic_error(oss.str());
+  }
+
+  svdOfA.backSubst(b, x);
+
+  // Calculate residual.
+  cv::Mat residualMatrix = (a*x - b);
+  double residualError = 0;
+  for (unsigned long int i = 0; i < numberOfMatrices*3; i++)
+  {
+    residualError += residualMatrix.at<double>(i, 0)*residualMatrix.at<double>(i, 0);
+  }
+  residualError /= (double)(numberOfMatrices*3);
+  residualError = sqrt(residualError);
+
+  // Prepare output
+  MakeIdentity(outputMatrix);
+  outputMatrix(0, 3) = x.at<double>(0, 0);
+  outputMatrix(1, 3) = x.at<double>(1, 0);
+  outputMatrix(2, 3) = x.at<double>(2, 0);
+
+  std::cout << "DoPivotCalibration:Pivot = (" << x.at<double>(3, 0) << ", " << x.at<double>(4, 0) << ", " << x.at<double>(5, 0) << "), residual=" << residualError << std::endl;
+  return residualError;
+}
+
 } // end namespace
