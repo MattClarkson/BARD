@@ -73,7 +73,7 @@ void SaveMatrixToFile(const cv::Matx44d& matrix, const std::string& fileName)
 
 
 //-----------------------------------------------------------------------------
-cv::Matx44d LoadMatrixFromFile(const std::string& fileName)
+std::vector<cv::Matx44d> LoadMatricesFromFile(const std::string& fileName)
 {
   if (fileName.size() == 0)
   {
@@ -83,26 +83,45 @@ cv::Matx44d LoadMatrixFromFile(const std::string& fileName)
   if (!ifs.is_open())
   {
     std::stringstream errMsg;
-    errMsg << "Failed to open file " << fileName << " to read matrix." << std::endl;
+    errMsg << "Failed to open file " << fileName << " to read matrices." << std::endl;
     throw std::runtime_error(errMsg.str());
   }
-  cv::Matx44d result;
-  for (int i = 0; i < 4; i++)
+  std::vector<cv::Matx44d> matrices;
+  cv::Matx44d matrix;
+  while(!ifs.eof())
   {
-    for (int j = 0; j < 4; j++)
+    for (int r = 0; r < 4; r++)
     {
-      double tmp;
-      ifs >> tmp;
-      result(i, j) = tmp;
+      for (int c = 0; c < 4; c++)
+      {
+        double tmp;
+        ifs >> tmp;
+        matrix(r, c) = tmp;
+      }
     }
+    if (!ifs.good())
+    {
+      std::stringstream errMsg;
+      errMsg << "Read " << matrices.size() << " matrices, now failed to read the next matrix in file " << fileName << std::endl;
+      throw std::runtime_error(errMsg.str());
+    }
+    matrices.push_back(matrix);
   }
-  if (!ifs.good())
+  return matrices;
+}
+
+
+//-----------------------------------------------------------------------------
+cv::Matx44d LoadMatrixFromFile(const std::string& fileName)
+{
+  std::vector<cv::Matx44d> matrices = LoadMatricesFromFile(fileName);
+  if (matrices.size() > 1)
   {
     std::stringstream errMsg;
-    errMsg << "Failed to read matrix in file " << fileName << std::endl;
+    errMsg << "Was expecting only 1 matrix in file " << fileName << std::endl;
     throw std::runtime_error(errMsg.str());
   }
-  return result;
+  return matrices[0];
 }
 
 

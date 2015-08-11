@@ -21,10 +21,13 @@ int main(int argc, char** argv)
   try
   {
     TCLAP::CmdLine cmd("Basic Augmented Reality Demo - Pivot Calibration", ' ', "0.1");
-    TCLAP::ValueArg<std::string> directoryArg("i","input","Directory containing lots of 4x4 matrices.",true,"","string");
-    cmd.add( directoryArg );
+    TCLAP::ValueArg<std::string> inputArg("i","input","File containing lots of 4x4 matrices.",true,"","string");
+    TCLAP::ValueArg<std::string> outputArg("o","output","Output file for (4 x 4) matrix.",true,"","string");
+    cmd.add( inputArg );
+    cmd.add( outputArg );
     cmd.parse( argc, argv );
-    std::string inputDir = directoryArg.getValue();
+    std::string inputFile = inputArg.getValue();
+    std::string outputFile = outputArg.getValue();
 
     // To Do. Implement pivot calibration.
 

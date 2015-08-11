@@ -29,6 +29,11 @@ std::vector<cv::Point3d> LoadPointsFromFile(const std::string& fileName);
 cv::Matx44d LoadMatrixFromFile(const std::string& fileName);
 
 /**
+ * \brief Loads main matrices from a single plain-text file.
+ */
+std::vector<cv::Matx44d> LoadMatricesFromFile(const std::string& fileName);
+
+/**
  * \brief Writes the matrix to file, as 4x4 plain-text numbers.
  */
 void SaveMatrixToFile(const cv::Matx44d& matrix, const std::string& fileName);
