@@ -40,5 +40,5 @@ Future Plans
 
  * Command line app to calibrate mono camera using OpenCV standard routines.
 
-(As of Aug 2015, these 3 apps were done using existing software, eg. NifTK))
+(As of Aug 2015, this can be done using various online tools)
 
