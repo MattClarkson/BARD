@@ -144,6 +144,7 @@ int main(int argc, char** argv)
     bard::MainWindow mainWin;
     mainWin.setCentralWidget(&myWidget);
     mainWin.show();
+    mainWin.setFixedSize(xSize, ySize);
 
     myWidget.GetInteractor()->Disable();
     myWidget.SetEnableImage(true);
