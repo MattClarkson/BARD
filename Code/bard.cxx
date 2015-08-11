@@ -17,14 +17,14 @@
 #include <cv.h>
 #include <iostream>
 
-#include <bardOpenCVVideoSource.h>
-#include <bardArucoProcessor.h>
-#include <bardPnPRegistration.h>
-#include <bardTrackingModelData.h>
-#include <bardMainWindow.h>
-#include <bardMainRenderingWidget.h>
-#include <bardVTKModelPipeline.h>
-#include <bardFileIO.h>
+#include "bardOpenCVVideoSource.h"
+#include "bardArucoProcessor.h"
+#include "bardPnPRegistration.h"
+#include "bardTrackingModelData.h"
+#include "bardMainWindow.h"
+#include "bardMainRenderingWidget.h"
+#include "bardVTKModelPipeline.h"
+#include "bardFileIO.h"
 
 int main(int argc, char** argv)
 {
