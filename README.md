@@ -3,7 +3,7 @@ Basic Augmented Reality Demo (BARD)
 
 This project was built for the [MediCSS](http://www.medicss.cs.ucl.ac.uk/) summer school 2015.
 
-The aim was to demo some features of VTK, OpenCV and ArUco.
+The aim was to demo some features of [VTK](http://www.vtk.org), [OpenCV](http://www.opencv.org) and [ArUco](http://www.uco.es/investiga/grupos/ava/node/26).
 
 Features
 --------
@@ -40,5 +40,5 @@ Future Plans
 
  * Command line app to calibrate mono camera using OpenCV standard routines.
 
-(As of Aug 2015, this can be done using various online tools)
+(As of Aug 2015, this can be done using various tools, such as Matlab, or [NifTK](http://www.niftk.org))
 
