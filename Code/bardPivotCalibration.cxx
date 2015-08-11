@@ -15,6 +15,10 @@
 #include <tclap/CmdLine.h>
 #include <stdexcept>
 #include <cstdlib>
+#include <cv.h>
+#include <strstream>
+
+#include "bardFileIO.h"
 
 int main(int argc, char** argv)
 {
@@ -29,8 +33,26 @@ int main(int argc, char** argv)
     std::string inputFile = inputArg.getValue();
     std::string outputFile = outputArg.getValue();
 
-    // To Do. Implement pivot calibration.
+    // 1. Load all matrices.
+    std::vector<cv::Matx44d> matrices = bard::LoadMatricesFromFile(inputFile);
+    if (matrices.size())
+    {
+      std::stringstream oss;
+      oss << "Failed to read matrices from file:" << inputFile << std::endl;
+      throw new std::runtime_error(oss.str());
+    }
 
+    // 2. Declare stuff.
+    cv::Matx44d offset;
+    double residual = 0;
+
+    // 3. Do pivot calib.
+
+    // 4. Output matrix.
+    bard::SaveMatrixToFile(offset, outputFile);
+
+    // 5. Finish up.
+    std::cout << "Residual=" << residual << std::endl;
     return EXIT_SUCCESS;
   }
   catch (TCLAP::ArgException &e)
