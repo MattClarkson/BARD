@@ -13,6 +13,8 @@
 #============================================================================*/
 
 set(VIDEO_SRCS
+  bardFileIO.cxx
+  bardMaths.cxx
   bardVideoSourceInterface.cxx
   bardOpenCVVideoSource.cxx
   bardCalibratedCamera.cxx
