@@ -19,6 +19,8 @@ Features
    1. provides a modified VTK camera that uses the calibrated intrinsic parameters
    1. moves the VTK camera according to a registration transformation from 3D reference model coordinates to 2D coordinates of ArUco markers
    1. tracks a single pointer, made using a separate ArUco marker
+   1. includes pivot calibration to create a pointer object
+   1. includes Procrustes analysis to register models to world coordinates
 
 Build Instructions
 ------------------
@@ -37,7 +39,6 @@ Future Plans
 ------------
 
  * Command line app to calibrate mono camera using OpenCV standard routines.
- * Command line app to do Pivot Calibration to make a pointer.
 
 (As of Aug 2015, these 3 apps were done using existing software, eg. NifTK))
 
