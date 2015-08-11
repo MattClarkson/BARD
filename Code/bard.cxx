@@ -81,13 +81,15 @@ int main(int argc, char** argv)
       throw std::runtime_error("You asked to record pointer movement, but did not provide an output directory.");
     }
 
-    cv::Point2i imageSize;
-    imageSize.x = xSize;
-    imageSize.y = ySize;
-
     QApplication app(argc, argv);
     app.setOrganizationName("CMIC");
     app.setApplicationName("BARD");
+
+    bard::MainWindow mainWin;
+
+    cv::Point2i imageSize;
+    imageSize.x = xSize;
+    imageSize.y = ySize;
 
     bard::OpenCVVideoSource mySource("");
     mySource.SetFlipY(doFlipY);
@@ -141,7 +143,6 @@ int main(int argc, char** argv)
       myWidget.AddVTKModel(modelForVisualisation);
     }
 
-    bard::MainWindow mainWin;
     mainWin.setCentralWidget(&myWidget);
     mainWin.show();
     mainWin.setFixedSize(xSize, ySize);

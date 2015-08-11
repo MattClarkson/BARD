@@ -30,17 +30,18 @@ int main(int argc, char** argv)
     cmd.parse( argc, argv );
     std::string outputFile = outputArg.getValue();
 
-    bard::OpenCVVideoSource mySource("");
-
     QApplication app(argc, argv);
     app.setOrganizationName("CMIC");
     app.setApplicationName("BARD");
+
+    bard::MainWindow mainWin;
+
+    bard::OpenCVVideoSource mySource("");
 
     bard::MainRenderingWidget myWidget;
     myWidget.SetVideoSource(&mySource);
     myWidget.SetDumpImageFileName(outputFile);
 
-    bard::MainWindow mainWin;
     mainWin.setCentralWidget(&myWidget);
     mainWin.setFixedSize(mySource.GetWidth(), mySource.GetHeight());
     mainWin.show();
