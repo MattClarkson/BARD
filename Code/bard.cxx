@@ -24,6 +24,7 @@
 #include <bardMainWindow.h>
 #include <bardMainRenderingWidget.h>
 #include <bardVTKModelPipeline.h>
+#include <bardFileIO.h>
 
 int main(int argc, char** argv)
 {
@@ -111,25 +112,7 @@ int main(int argc, char** argv)
     cv::Matx14d distortionParameters;
     if (intrinsicsFile.size() > 0)
     {
-      std::ifstream ifs(intrinsicsFile.c_str());
-      if (!ifs.is_open())
-      {
-        throw std::runtime_error("Failed to open intrinsics file.");
-      }
-      for (int i = 0; i < 3; i++)
-      {
-        ifs >> intrinsicParameters(i, 0);
-        ifs >> intrinsicParameters(i, 1);
-        ifs >> intrinsicParameters(i, 2);
-      }
-      for (int i = 0; i < 4; i++)
-      {
-        ifs >> distortionParameters(0, i);
-      }
-      if (!ifs.good())
-      {
-        throw std::runtime_error("Failed to read intrinsics file.");
-      }
+      bard::LoadCameraParameters(intrinsicsFile, intrinsicParameters, distortionParameters);
       myWidget.SetCameraIntrinsics(intrinsicParameters);
     }
 
@@ -137,24 +120,7 @@ int main(int argc, char** argv)
     cv::Matx44d registerModelsToWorld;
     if (modelAlignFile.size() > 0)
     {
-      std::ifstream ifs(modelAlignFile.c_str());
-      if (!ifs.is_open())
-      {
-        throw std::runtime_error("Failed to open registration file.");
-      }
-      for (int i = 0; i < 4; i++)
-      {
-        for (int j = 0; j < 4; j++)
-        {
-          double tmp;
-          ifs >> tmp;
-          registerModelsToWorld(i, j) = tmp;
-        }
-      }
-      if (!ifs.good())
-      {
-        throw std::runtime_error("Failed to read registration file.");
-      }
+      registerModelsToWorld = bard::LoadMatrixFromFile(modelAlignFile);
       myWidget.SetModelsToWorld(registerModelsToWorld);
     }
 

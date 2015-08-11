@@ -19,14 +19,24 @@ namespace bard
 {
 
 /**
- * \brief Loads a flat text file containing 3 floats (x, y, z coordinates) per line.
+ * \brief Loads a plain-text file containing 3 floats per line (x, y, z coordinates).
  */
 std::vector<cv::Point3d> LoadPointsFromFile(const std::string& fileName);
+
+/**
+ * \brief Loads a plain-text file containing 4 rows of 4 floats.
+ */
+cv::Matx44d LoadMatrixFromFile(const std::string& fileName);
 
 /**
  * \brief Writes the matrix to file, as 4x4 plain-text numbers.
  */
 void SaveMatrixToFile(const cv::Matx44d& matrix, const std::string& fileName);
+
+/**
+ * \brief Loads 3x3 intrinsic and 1x4 distortion parameters.
+ */
+void LoadCameraParameters(const std::string fileName, cv::Matx33d& intrinsicParameters, cv::Matx14d& distortionParameters);
 
 } // end namespace
 
