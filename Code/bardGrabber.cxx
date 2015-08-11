@@ -28,7 +28,12 @@ int main(int argc, char** argv)
     std::string outputFile = outputArg.getValue();
 
     bard::OpenCVVideoSource mySource("");
+    std::cout << "Camera is running, wait for auto-gain correction to settle, then enter a character and hit return." << std::endl;
+
+    char c;
+    std::cin >> c;
     mySource.DumpImage(outputFile);
+
     return EXIT_SUCCESS;
   }
   catch (TCLAP::ArgException &e)
