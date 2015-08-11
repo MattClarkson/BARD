@@ -64,6 +64,9 @@ public:
   /** Output must be in BGR format, which I believe is normal OpenCV format. */
   virtual const cv::Mat* const ExposeOpenCVImage() = 0;
 
+  /** Writes image to file. */
+  virtual void DumpImage(const std::string& fileName) = 0;
+
 private:
 
   bool m_FlipY;

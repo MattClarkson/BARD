@@ -39,7 +39,7 @@ public:
   virtual bool GrabImage();
   virtual const unsigned char* const ExposeImage();
   virtual const cv::Mat* const ExposeOpenCVImage();
-  void DumpImage(const std::string& fileName);
+  virtual void DumpImage(const std::string& fileName);
 
 private:
 

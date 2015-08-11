@@ -49,6 +49,7 @@ public:
   void SetCalibratedImageSize(const cv::Point2i& imageSize);
   void SetModelsToWorld(const cv::Matx44d& modelToWorld);
   void SetOutputDirectory(const std::string& output);
+  void SetDumpImageFileName(const std::string& fileName);
   void SetRecordMatrix(bool doRecord);
   void SetRecordPointOfInterest(bool doRecord);
 
@@ -72,6 +73,8 @@ public:
   void SetWorldToCameraTransform(const vtkMatrix4x4& matrix);
   vtkSmartPointer<vtkMatrix4x4> GetWorldToCameraTransform() const;
 
+  virtual void keyPressEvent(QKeyEvent * event);
+
 private slots:
 
   void OnTimerTriggered();
@@ -84,6 +87,7 @@ private:
   void UpdateLayers();
   void WriteMatrix(int i, vtkMatrix4x4& matrix);
   void WritePoint(int i, vtkMatrix4x4& matrix, cv::Point3d& point);
+  void DumpImage();
 
   // To store camera intrinsic parameters;
   cv::Matx33d                          m_Intrinsics;
@@ -122,6 +126,7 @@ private:
   vtkSmartPointer<vtkMatrix4x4>        m_CameraToWorldTransform;
   vtkSmartPointer<vtkMatrix4x4>        m_ModelToWorldTransform;
   std::string                          m_OutputDirectory;
+  std::string                          m_DumpImageFileName;
   bool                                 m_RecordMatrix;
   bool                                 m_RecordPointOfInterest;
   unsigned long int                    m_FrameCounter;

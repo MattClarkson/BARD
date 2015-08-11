@@ -20,6 +20,8 @@
 #include <vtkRendererCollection.h>
 #include <sstream>
 #include <ostream>
+#include <QKeyEvent>
+#include <QApplication>
 
 namespace bard
 {
@@ -40,6 +42,7 @@ MainRenderingWidget::MainRenderingWidget()
 , m_WorldToCameraTransform(NULL)
 , m_CameraToWorldTransform(NULL)
 , m_OutputDirectory("")
+, m_DumpImageFileName("")
 , m_RecordMatrix(false)
 , m_RecordPointOfInterest(false)
 , m_FrameCounter(0)
@@ -157,6 +160,13 @@ void MainRenderingWidget::SetModelsToWorld(const cv::Matx44d& modelToWorld)
 void MainRenderingWidget::SetOutputDirectory(const std::string& output)
 {
   m_OutputDirectory = output;
+}
+
+
+//-----------------------------------------------------------------------------
+void MainRenderingWidget::SetDumpImageFileName(const std::string& fileName)
+{
+  m_DumpImageFileName = fileName;
 }
 
 
@@ -609,6 +619,27 @@ void MainRenderingWidget::WritePoint(int i, vtkMatrix4x4& matrix, cv::Point3d& p
 
   ofs << vtkPoint[0] << " " << vtkPoint[1] << " " << vtkPoint[2] << std::endl;
   ofs.close();
+}
+
+
+//-----------------------------------------------------------------------------
+void MainRenderingWidget::DumpImage()
+{
+  if (m_VideoSource != NULL && m_DumpImageFileName.size() > 0)
+  {
+    (*m_VideoSource).DumpImage(m_DumpImageFileName);
+    QApplication::closeAllWindows();
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+void MainRenderingWidget::keyPressEvent(QKeyEvent * event)
+{
+  if (event != NULL && event->key() == Qt::Key_D)
+  {
+    this->DumpImage();
+  }
 }
 
 } // end namespace

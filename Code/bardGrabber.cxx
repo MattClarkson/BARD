@@ -12,7 +12,10 @@
 
 ============================================================================*/
 #include "bardOpenCVVideoSource.h"
+#include "bardMainWindow.h"
+#include "bardMainRenderingWidget.h"
 
+#include <QApplication>
 #include <tclap/CmdLine.h>
 #include <iostream>
 #include <cstdlib>
@@ -28,13 +31,25 @@ int main(int argc, char** argv)
     std::string outputFile = outputArg.getValue();
 
     bard::OpenCVVideoSource mySource("");
-    std::cout << "Camera is running, wait for auto-gain correction to settle, then enter a character and hit return." << std::endl;
 
-    char c;
-    std::cin >> c;
-    mySource.DumpImage(outputFile);
+    QApplication app(argc, argv);
+    app.setOrganizationName("CMIC");
+    app.setApplicationName("BARD");
 
-    return EXIT_SUCCESS;
+    bard::MainRenderingWidget myWidget;
+    myWidget.SetVideoSource(&mySource);
+    myWidget.SetDumpImageFileName(outputFile);
+
+    bard::MainWindow mainWin;
+    mainWin.setCentralWidget(&myWidget);
+    mainWin.setFixedSize(mySource.GetWidth(), mySource.GetHeight());
+    mainWin.show();
+
+    myWidget.GetInteractor()->Disable();
+    myWidget.SetEnableImage(true);
+
+    int status = app.exec();
+    return status;
   }
   catch (TCLAP::ArgException &e)
   {
