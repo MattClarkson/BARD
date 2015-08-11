@@ -34,7 +34,7 @@ cv::Matx44d LoadMatrixFromFile(const std::string& fileName);
 void SaveMatrixToFile(const cv::Matx44d& matrix, const std::string& fileName);
 
 /**
- * \brief Loads 3x3 intrinsic and 1x4 distortion parameters.
+ * \brief Loads 3x3 intrinsic and 1x4 distortion parameters from plain-text file.
  */
 void LoadCameraParameters(const std::string fileName, cv::Matx33d& intrinsicParameters, cv::Matx14d& distortionParameters);
 
