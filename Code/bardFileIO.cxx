@@ -99,13 +99,10 @@ std::vector<cv::Matx44d> LoadMatricesFromFile(const std::string& fileName)
         matrix(r, c) = tmp;
       }
     }
-    if (!ifs.good())
+    if (ifs.good())
     {
-      std::stringstream errMsg;
-      errMsg << "Read " << matrices.size() << " matrices, now failed to read the next matrix in file " << fileName << std::endl;
-      throw std::runtime_error(errMsg.str());
+      matrices.push_back(matrix);
     }
-    matrices.push_back(matrix);
   }
   return matrices;
 }
