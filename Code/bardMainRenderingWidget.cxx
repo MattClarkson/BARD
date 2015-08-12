@@ -43,7 +43,6 @@ MainRenderingWidget::MainRenderingWidget()
 , m_WorldToCameraTransform(NULL)
 , m_CameraToWorldTransform(NULL)
 , m_OutputDirectory("")
-, m_DumpImageFileName("")
 , m_RecordMatrix(false)
 , m_RecordPointOfInterest(false)
 , m_FrameCounter(0)
@@ -161,13 +160,6 @@ void MainRenderingWidget::SetModelsToWorld(const cv::Matx44d& modelToWorld)
 void MainRenderingWidget::SetOutputDirectory(const std::string& output)
 {
   m_OutputDirectory = output;
-}
-
-
-//-----------------------------------------------------------------------------
-void MainRenderingWidget::SetDumpImageFileName(const std::string& fileName)
-{
-  m_DumpImageFileName = fileName;
 }
 
 
@@ -624,47 +616,49 @@ void MainRenderingWidget::WritePoint(int i, vtkMatrix4x4& matrix, cv::Point3d& p
 
 
 //-----------------------------------------------------------------------------
-void MainRenderingWidget::DumpImage()
-{
-  if (m_VideoSource != NULL && m_DumpImageFileName.size() > 0)
-  {
-    (*m_VideoSource).DumpImage(m_DumpImageFileName);
-    QApplication::closeAllWindows();
-  }
-}
-
-
-//-----------------------------------------------------------------------------
 void MainRenderingWidget::keyPressEvent(QKeyEvent * event)
 {
   if (event != NULL)
   {
-    if (event->key() == Qt::Key_D)
+    if (event->key() == Qt::Key_Q)
     {
-      this->DumpImage();
+      QApplication::closeAllWindows();
+      return;
     }
-    else if (event->key() == Qt::Key_S)
-    {
-      if (m_OutputDirectory.size() > 0)
-      {
-        std::stringstream oss;
-        oss << m_OutputDirectory << m_PathSeparator << "screenshot." << m_FrameCounter << ".png";
 
+    if (event->key() == Qt::Key_D || event->key() == Qt::Key_S)
+    {
+      if (m_OutputDirectory.size() == 0)
+      {
+        std::cerr << "Error: Can't capture screenshot/video, as you have not specified -d" << std::endl;
+        return;
+      }
+
+      std::stringstream oss;
+      oss << m_OutputDirectory << m_PathSeparator;
+
+      if (event->key() == Qt::Key_D)
+      {
+        if (m_VideoSource != NULL)
+        {
+          oss << "video." << m_FrameCounter << ".png";
+          (*m_VideoSource).DumpImage(oss.str());
+        }
+        else
+        {
+          std::cerr << "Error: You asked to capture video, but I have no video source." << std::endl;
+        }
+      }
+      else if (event->key() == Qt::Key_S)
+      {
+        oss << "screenshot." << m_FrameCounter << ".png";
         vtkSmartPointer<vtkPNGWriter> fileWriter = vtkSmartPointer<vtkPNGWriter>::New();
         fileWriter->SetInputData(this->cachedImage());
         fileWriter->SetFileName(oss.str().c_str());
         fileWriter->Write();
       }
-      else
-      {
-        std::cerr << "Error: Can't capture screenshot, as you have not specified -d" << std::endl;
-      }
-    }
-    else if (event->key() == Qt::Key_Q)
-    {
-      QApplication::closeAllWindows();
-    }
-  }
+    } // end if D or S.
+  } // end if event not null.
 }
 
 } // end namespace

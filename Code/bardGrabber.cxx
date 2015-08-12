@@ -25,10 +25,10 @@ int main(int argc, char** argv)
   try
   {
     TCLAP::CmdLine cmd("Basic Augmented Reality Demo - Frame Grabber", ' ', "0.1");
-    TCLAP::ValueArg<std::string> outputArg("o","output","Filename to write an image to.",true,"","string");
-    cmd.add( outputArg );
+    TCLAP::ValueArg<std::string> outputDirArg("d", "directory", "Output directory to dump files.", false, "", "string");
+    cmd.add( outputDirArg );
     cmd.parse( argc, argv );
-    std::string outputFile = outputArg.getValue();
+    std::string outputDir = outputDirArg.getValue();
 
     QApplication app(argc, argv);
     app.setOrganizationName("CMIC");
@@ -40,7 +40,6 @@ int main(int argc, char** argv)
 
     bard::MainRenderingWidget myWidget;
     myWidget.SetVideoSource(&mySource);
-    myWidget.SetDumpImageFileName(outputFile);
 
     mainWin.setCentralWidget(&myWidget);
     mainWin.setFixedSize(mySource.GetWidth(), mySource.GetHeight());
@@ -49,6 +48,7 @@ int main(int argc, char** argv)
 
     myWidget.GetInteractor()->Disable();
     myWidget.SetEnableImage(true);
+    myWidget.SetOutputDirectory(outputDir);
 
     int status = app.exec();
     return status;
