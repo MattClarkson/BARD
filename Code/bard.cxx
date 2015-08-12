@@ -145,7 +145,7 @@ int main(int argc, char** argv)
 
     mainWin.setCentralWidget(&myWidget);
     mainWin.show();
-    mainWin.setFixedSize(xSize, ySize);
+    mainWin.raise();
 
     myWidget.GetInteractor()->Disable();
     myWidget.SetEnableImage(true);
