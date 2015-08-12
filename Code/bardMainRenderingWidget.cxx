@@ -18,6 +18,7 @@
 #include <vtkRenderWindow.h>
 #include <vtkImageData.h>
 #include <vtkRendererCollection.h>
+#include <vtkPNGWriter.h>
 #include <sstream>
 #include <ostream>
 #include <QKeyEvent>
@@ -636,9 +637,33 @@ void MainRenderingWidget::DumpImage()
 //-----------------------------------------------------------------------------
 void MainRenderingWidget::keyPressEvent(QKeyEvent * event)
 {
-  if (event != NULL && event->key() == Qt::Key_D)
+  if (event != NULL)
   {
-    this->DumpImage();
+    if (event->key() == Qt::Key_D)
+    {
+      this->DumpImage();
+    }
+    else if (event->key() == Qt::Key_S)
+    {
+      if (m_OutputDirectory.size() > 0)
+      {
+        std::stringstream oss;
+        oss << m_OutputDirectory << m_PathSeparator << "screenshot." << m_FrameCounter << ".png";
+
+        vtkSmartPointer<vtkPNGWriter> fileWriter = vtkSmartPointer<vtkPNGWriter>::New();
+        fileWriter->SetInputData(this->cachedImage());
+        fileWriter->SetFileName(oss.str().c_str());
+        fileWriter->Write();
+      }
+      else
+      {
+        std::cerr << "Error: Can't capture screenshot, as you have not specified -d" << std::endl;
+      }
+    }
+    else if (event->key() == Qt::Key_Q)
+    {
+      QApplication::closeAllWindows();
+    }
   }
 }
 
