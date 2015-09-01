@@ -21,6 +21,7 @@ Features
    1. tracks a single pointer, made using a separate ArUco marker
  1. `bardPivotCalibration` does pivot calibration to create a pointer object. See [Feuerstein 2008](http://dx.doi.org/10.1109/TMI.2007.907327).
  1. `bardProcrustes` does point based registration (Procrustes analysis). See [Arun 1987](http://dx.doi.org/10.1109/TPAMI.1987.4767965).
+ 1. `bardCameraCalibration` does intrinsic camera calibration, based on OpenCV. See [OpenCV](http://docs.opencv.org/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html).
 
 Build Instructions
 ------------------
@@ -34,11 +35,4 @@ cd BARD-SuperBuild-Debug
 ccmake ../BARD
 make
 ```
-
-Future Plans
-------------
-
- * Command line app to calibrate mono camera using OpenCV standard routines.
-
-(As of Aug 2015, this can be done using various tools, such as Matlab, or [NifTK](http://www.niftk.org))
 
