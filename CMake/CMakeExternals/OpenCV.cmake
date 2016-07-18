@@ -22,7 +22,7 @@ if(DEFINED OpenCV_DIR AND NOT EXISTS ${OpenCV_DIR})
   message(FATAL_ERROR "OpenCV_DIR variable is defined but corresponds to non-existing directory")
 endif()
 
-set(version "2.4.8.2")
+set(version "2.4.11")
 set(location "${BARD_EP_TARBALL_LOCATION}/OpenCV-${version}.tar.gz")
 
 bardMacroDefineExternalProjectVariables(OpenCV ${version} ${location})
@@ -35,6 +35,13 @@ if(NOT DEFINED OpenCV_DIR)
 
   set(OpenCV_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${CMAKE_SOURCE_DIR}/CMake/CMakeExternals/EmptyFileForPatching.dummy -P ${CMAKE_SOURCE_DIR}/CMake/CMakeExternals/PatchOpenCV-2.4.8.2.cmake)
 
+  set(ffmpeg_lookup_patch
+    COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/OpenCV-2.4.11-ffmpeg_lookup.patch
+  )
+  set(ffmpeg_export_paths
+    COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/OpenCV-2.4.11-ffmpeg_export_paths.patch
+  )
+
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ^^
     PREFIX ${proj_CONFIG}
@@ -43,7 +50,10 @@ if(NOT DEFINED OpenCV_DIR)
     INSTALL_DIR ${proj_INSTALL}
     URL ${proj_LOCATION}
     URL_MD5 ${proj_CHECKSUM}
-    PATCH_COMMAND ${OpenCV_PATCH_COMMAND}
+    # Related bug: http://bugs.mitk.org/show_bug.cgi?id=5912
+    PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/OpenCV-2.4.11.patch
+                  ${ffmpeg_lookup_patch}
+                  ${ffmpeg_export_paths}
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
       ${EP_COMMON_ARGS}
@@ -59,6 +69,7 @@ if(NOT DEFINED OpenCV_DIR)
       -DBUILD_DOCS:BOOL=OFF
       -DBUILD_DOXYGEN_DOCS:BOOL=OFF
       -DBUILD_PERF_TESTS:BOOL=OFF
+      -DBUILD_NEW_PYTHON_SUPPORT:BOOL=OFF
       -DWITH_CUDA:BOOL=${OPENCV_WITH_CUDA}
       -DWITH_QT:BOOL=OFF
       -DWITH_EIGEN:BOOL=OFF
