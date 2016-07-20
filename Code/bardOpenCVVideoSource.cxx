@@ -51,6 +51,29 @@ OpenCVVideoSource::OpenCVVideoSource(const std::string& fileName)
   }
 }
 
+//-----------------------------------------------------------------------------
+OpenCVVideoSource::OpenCVVideoSource(const int& index)
+{
+  m_VideoCapture = new cv::VideoCapture(index);
+
+  if (m_VideoCapture == NULL)
+  {
+    throw std::runtime_error("Video capture device is NULL.");
+  }
+
+  if (!m_VideoCapture->isOpened())
+  {
+    throw std::runtime_error("Video capture device failed to open.");
+  }
+
+  m_FileName = "";
+
+  // Grab at least one frame, so image is initialised.
+  if (!this->GrabImage())
+  {
+    throw std::runtime_error("Failed to grab first frame.");
+  }
+}
 
 //-----------------------------------------------------------------------------
 OpenCVVideoSource::~OpenCVVideoSource()

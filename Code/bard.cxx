@@ -40,6 +40,7 @@ int main(int argc, char** argv)
     TCLAP::ValueArg<float> imageOpacityArg("o","opacity","Image opacity.",false,0.5,"float");
     TCLAP::ValueArg<int> imageXSizeArg("x","xsize","xsize when calibrating.",true,1,"int");
     TCLAP::ValueArg<int> imageYSizeArg("y","ysize","ysize when calibrating.",true,1,"int");
+    TCLAP::ValueArg<int> openCVSourceIndex("i", "index", "Camera Index to use", false, 0, "int");
     TCLAP::SwitchArg doDistortionArg("c","correct","Do distortion correction.", false);
     TCLAP::SwitchArg flipSwitchArg("f","flip","Flip in Y-axis.", false);
     TCLAP::SwitchArg pointerRecordMatrixArg("r","record","Record pointer matrix (e.g. for pivot calib).", false);
@@ -53,6 +54,7 @@ int main(int argc, char** argv)
     cmd.add( imageOpacityArg );
     cmd.add( imageXSizeArg );
     cmd.add( imageYSizeArg );
+    cmd.add( openCVSourceIndex );
     cmd.add( doDistortionArg );
     cmd.add( flipSwitchArg );
     cmd.add( pointerRecordMatrixArg );
@@ -67,6 +69,7 @@ int main(int argc, char** argv)
     float opacity = imageOpacityArg.getValue();
     int xSize = imageXSizeArg.getValue();
     int ySize = imageYSizeArg.getValue();
+    int sourceIndex = openCVSourceIndex.getValue();
     bool doDistortionCorrection = doDistortionArg.getValue();
     bool doFlipY = flipSwitchArg.getValue();
     bool pointerRecordMatrix = pointerRecordMatrixArg.getValue();
@@ -91,7 +94,7 @@ int main(int argc, char** argv)
     imageSize.x = xSize;
     imageSize.y = ySize;
 
-    bard::OpenCVVideoSource mySource("");
+    bard::OpenCVVideoSource mySource(sourceIndex);
     mySource.SetFlipY(doFlipY);
     mySource.SetUndistort(doDistortionCorrection);
 
