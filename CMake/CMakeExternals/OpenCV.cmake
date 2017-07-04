@@ -82,7 +82,9 @@ if(NOT DEFINED OpenCV_DIR)
     DEPENDS ${proj_DEPENDENCIES}
   )
 
-  set(OpenCV_DIR ${proj_BUILD})
+  set(OpenCV_DIR ${proj_INSTALL})
+  set(BARD_PREFIX_PATH ${proj_INSTALL}^^${BARD_PREFIX_PATH})
+
   message("SuperBuild loading OpenCV from ${OpenCV_DIR}")
 
 else()

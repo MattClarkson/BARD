@@ -98,7 +98,9 @@ if(NOT DEFINED VTK_DIR)
     DEPENDS ${proj_DEPENDENCIES}
   )
 
-  set(VTK_DIR ${proj_BUILD})
+  set(VTK_DIR ${proj_INSTALL})
+  set(BARD_PREFIX_PATH ${proj_INSTALL}^^${BARD_PREFIX_PATH})
+
   message("SuperBuild loading VTK from ${VTK_DIR}")
 
 else(NOT DEFINED VTK_DIR)
