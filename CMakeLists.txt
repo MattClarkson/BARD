@@ -111,12 +111,31 @@ set(CMAKE_MODULE_PATH
 
 set(DESIRED_QT_VERSION 4 CACHE STRING "Pick a version of Qt to use: 4 or 5")
 
-# We ALWAYS need Qt. This is because MITK always needs it.
-find_package(Qt4 COMPONENTS QtCore QtGui QtXml QtNetwork REQUIRED)
-set(QT_USE_QTXML 1)
-set(QT_USE_QTXMLPATTERNS 1)
-set(QT_USE_PHONON 0)
-include(${QT_USE_FILE})
+if(DESIRED_QT_VERSION MATCHES 4)
+  set(QT4_COMPONENTS QtCore QtGui)
+  find_package(Qt4 COMPONENTS ${QT4_COMPONENTS} REQUIRED)
+  if(QT_FOUND)
+    set(QT_USE_QTTEST 1)
+    set(QT_USE_QTXML 1)
+    set(QT_USE_QTXMLPATTERNS 1)
+    set(QT_USE_PHONON 0)
+    include(${QT_USE_FILE})
+  endif()
+endif()
+if(DESIRED_QT_VERSION MATCHES 5)
+  set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" CACHE PATH "")
+  set(QT5_COMPONENTS Core Gui Widgets WebKitWidgets)
+  find_package(Qt5 COMPONENTS ${QT5_COMPONENTS} REQUIRED)
+  if(Qt5_DIR)
+    get_filename_component(_Qt5_DIR "${Qt5_DIR}/../../../" ABSOLUTE)
+    list(FIND CMAKE_PREFIX_PATH "${_Qt5_DIR}" _result)
+    if(_result LESS 0)
+      set(CMAKE_PREFIX_PATH "${_Qt5_DIR};${CMAKE_PREFIX_PATH}" CACHE PATH "" FORCE)
+    endif()
+    set(BARD_PREFIX_PATH ${_Qt5_DIR})
+  endif()
+endif()
+
 if(BUILD_SUPERBUILD)
   set(VTK_QT_ARGS
     -DVTK_QT_VERSION:STRING=${DESIRED_QT_VERSION}
@@ -125,7 +144,7 @@ if(BUILD_SUPERBUILD)
     -DVTK_USE_QT:BOOL=ON
     -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
   )
-endif(BUILD_SUPERBUILD)
+endif()
 
  
 ######################################################################
