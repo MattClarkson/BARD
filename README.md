@@ -37,7 +37,9 @@ Currently tested on:
 
 Notes:
  1. BUILD_SHARED_LIBS must be ON due to duplicate symbols in ArUco.
- 1. On Windows, StartVS_Debug.bat / StartVS_Release.bat should be used to launch Visual Studio.
+ 1. Supervisor should explain the SuperBuild (a.k.a MetaBuild) and BARD-build folder structure.
+ 1. On Windows, StartVS_Debug.bat / StartVS_Release.bat in build folder should be used to launch Visual Studio.
+ 1. On Linux and Mac, once compiled, you will probably have to set LD_LIBRARY_PATH or DYLD_LIBRARY_PATH (Mac) to find libraries such as ArUco, VTK, OpenCV and Qt.
   
 ```
 git clone https://github.com/MattClarkson/BARD.git
