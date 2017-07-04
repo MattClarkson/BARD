@@ -276,7 +276,8 @@ include(${VTK_USE_FILE})
 set(OpenCV_FIND_QUIETLY ON)
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
-
+add_definitions(-DBUILD_OpenCV)
+list(APPEND ADDITIONAL_SEARCH_PATHS "${OpenCV_LIB_DIR}/../bin;${ADDITIONAL_SEARCH_PATHS}")
 find_package(aruco REQUIRED)
 
 set(ALL_LIBS)
