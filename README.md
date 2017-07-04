@@ -35,6 +35,9 @@ Currently tested on:
  1. Mac OSX 10.10.5, Qt 4.8.7, CMake 3.1.2, clang 600.0.57
  1. Windows, Qt 5.4.0, Visual Studio 2013.
 
+Notes:
+ 1. BUILD_SHARED_LIBS must be ON due to duplicate symbols in ArUco.
+ 1. On Windows, StartVS_Debug.bat / StartVS_Release.bat should be used to launch Visual Studio.
   
 ```
 git clone https://github.com/MattClarkson/BARD.git
