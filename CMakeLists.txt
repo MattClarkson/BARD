@@ -92,6 +92,10 @@ endif()
 option(BUILD_SHARED_LIBS "Build BARD with shared libraries." ON)
 set(BARD_EP_TARBALL_LOCATION "http://cmic.cs.ucl.ac.uk/platform/dependencies")
 
+if (NOT BUILD_SHARED_LIBS)
+  message(FATAL_ERROR "This project must be built with BUILD_SHARED_LIBS=ON due to bug in ArUco.")
+endif()
+
 
 ######################################################################
 # Setup the path to load CMake macros, and extra CMake files.
