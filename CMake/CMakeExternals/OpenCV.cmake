@@ -57,6 +57,7 @@ if(NOT DEFINED OpenCV_DIR)
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
       ${EP_COMMON_ARGS}
+      -DCMAKE_PREFIX_PATH:STRING=${BARD_PREFIX_PATH}
       -DBUILD_opencv_core:BOOL=ON
       -DBUILD_opencv_calib3d:BOOL=ON
       -DBUILD_opencv_features2d:BOOL=ON

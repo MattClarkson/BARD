@@ -276,26 +276,37 @@ endif()
 
 find_package(VTK REQUIRED)
 include(${VTK_USE_FILE})
-list(APPEND ADDITIONAL_SEARCH_PATHS ${VTK_LIBRARY_DIRS})
-message("Matt, VTK_INCLUDE_DIRS=${VTK_INCLUDE_DIRS}, VTK_LIBRARY_DIRS=${VTK_INSTALL_PREFIX}/lib")
+list(APPEND ADDITIONAL_SEARCH_PATHS "${VTK_INSTALL_PREFIX}/lib")
 
 set(OpenCV_FIND_QUIETLY ON)
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 add_definitions(-DBUILD_OpenCV)
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-  list(APPEND ADDITIONAL_SEARCH_PATHS ${OpenCV_LIB_DIR_DBG})
+if(WIN32)
+  list(APPEND ADDITIONAL_SEARCH_PATHS ${OpenCV_LIB_PATH})
 else()
-  list(APPEND ADDITIONAL_SEARCH_PATHS ${OpenCV_LIB_DIR_OPT})
+  list(APPEND ADDITIONAL_SEARCH_PATHS "${OpenCV_INSTALL_PATH}/lib")
 endif()
 
 find_package(aruco REQUIRED)
 list(APPEND ADDITIONAL_SEARCH_PATHS ${aruco_LIB_DIR})
 
-message("Matt, ADDITIONAL_SEARCH_PATHS=${ADDITIONAL_SEARCH_PATHS}")
-
 set(ALL_LIBS)
 list(APPEND ALL_LIBS ${aruco_LIBS} ${OpenCV_LIBS} ${VTK_LIBRARIES})
+
+set(ADDITIONAL_BIN_DIRS)
+#if(WIN32)
+  foreach (_dir ${ADDITIONAL_SEARCH_PATHS})
+    get_filename_component(_up_dir ${_dir} PATH)
+    if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_LESS 2.8)
+      get_filename_component(_abs_dir ${_up_dir} ABSOLUTE)
+    else()
+      get_filename_component(_abs_dir ${_up_dir} REALPATH)
+    endif()
+    list(APPEND ADDITIONAL_BIN_DIRS "${_abs_dir}/bin")
+  endforeach()
+##endif()
+
 
 ######################################################################
 # Output directories, for when compiling, not installing.
