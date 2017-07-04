@@ -1,7 +1,7 @@
 Basic Augmented Reality Demo (BARD)
 ===================================
 
-This project was built for the [MediCSS](http://www.medicss.cs.ucl.ac.uk/) summer school 2015.
+This project was built for the [MediCSS](http://www.medicss.cs.ucl.ac.uk/) summer school 2015-2017
 
 The aim was to demo some features of [VTK](http://www.vtk.org), [OpenCV](http://www.opencv.org) and [ArUco](http://www.uco.es/investiga/grupos/ava/node/26).
 
@@ -26,13 +26,22 @@ Features
 Build Instructions
 ------------------
 
-Currently tested on Mac OSX 10.10.4, using Xcode 6.1, Qt 4.8.7, CMake 3.1.2
+ 1. CMake version: 3.1+
+ 1. Qt version: Tested with 4.8.7 or 5.4.2. If you go much newer then Qt 5.4.2 you will probably have to build Qt to ensure it has QtWebkitWidgets
+ 1. Ensure qmake is on your PATH
+ 1. Install git bash from http://git-scm.com
 
+Currently tested on:
+ 1. Mac OSX 10.10.5, Qt 4.8.7, CMake 3.1.2, clang 600.0.57
+ 1. Windows, Qt 5.4.0, Visual Studio 2013.
+
+  
 ```
 git clone https://github.com/MattClarkson/BARD.git
 mkdir BARD-SuperBuild-Debug
 cd BARD-SuperBuild-Debug
 ccmake ../BARD
+(set some options, most likely for Qt)
 make
 ```
 
