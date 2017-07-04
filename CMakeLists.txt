@@ -114,10 +114,14 @@ endif()
 
 
 ######################################################################
+# This is for setting up runtime VS environment.
+######################################################################
+set(ADDITIONAL_SEARCH_PATHS)
+
+######################################################################
 # Find Qt. We need to check for Qt first, before we go ahead and do
 # the Superbuild, because VTK needs to know if we have Qt.
 ######################################################################
-
 set(DESIRED_QT_VERSION 5 CACHE STRING "Pick a version of Qt to use: 4 or 5")
 
 if(DESIRED_QT_VERSION MATCHES 4)
@@ -143,6 +147,35 @@ if(DESIRED_QT_VERSION MATCHES 5)
     endif()
     set(BARD_PREFIX_PATH ${_Qt5_DIR})
   endif()
+endif()
+
+# Determine the Qt4/5 library installation prefix
+set(_qmake_location )
+if(DESIRED_QT_VERSION MATCHES 4)
+  set(_qmake_location ${QT_QMAKE_EXECUTABLE})
+elseif(DESIRED_QT_VERSION MATCHES 5 AND TARGET ${Qt5Core_QMAKE_EXECUTABLE})
+  get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE}
+               PROPERTY IMPORT_LOCATION)
+endif()
+if(_qmake_location)
+  if(NOT _qt_install_libs)
+    if(WIN32)
+      execute_process(COMMAND ${_qmake_location} -query QT_INSTALL_BINS
+                      OUTPUT_VARIABLE _qt_install_libs
+                      OUTPUT_STRIP_TRAILING_WHITESPACE)
+    else()
+      execute_process(COMMAND ${_qmake_location} -query QT_INSTALL_LIBS
+                      OUTPUT_VARIABLE _qt_install_libs
+                      OUTPUT_STRIP_TRAILING_WHITESPACE)
+    endif()
+    file(TO_CMAKE_PATH "${_qt_install_libs}" _qt_install_libs)
+    set(_qt_install_libs ${_qt_install_libs} CACHE INTERNAL "Qt library installation prefix" FORCE)
+  endif()
+  if(_qt_install_libs)
+    list(APPEND ADDITIONAL_SEARCH_PATHS ${_qt_install_libs})
+  endif()
+elseif(MITK_USE_QT)
+  message(WARNING "The qmake executable could not be found.")
 endif()
 
 if(BUILD_SUPERBUILD)
@@ -296,4 +329,18 @@ include_directories(
 ######################################################################
 
 add_subdirectory(Code)
+
+######################################################################
+# If we are under Windows, create batch files which correctly
+# set up the environment for Visual Studio. These are only used to
+# start VS when developing. Not used in the final installation package.
+######################################################################
+if(WIN32)
+  set(VS_SOLUTION_FILE "${PROJECT_BINARY_DIR}/${PROJECT_NAME}.sln")
+  foreach(VS_BUILD_TYPE ${CMAKE_CONFIGURATION_TYPES})
+    configure_file("${CMAKE_SOURCE_DIR}/CMake/StartVS.bat.in" ${PROJECT_BINARY_DIR}/StartVS_${VS_BUILD_TYPE}.bat @ONLY)
+    message( "CreateWindowsBatchScript: Creating ${PROJECT_BINARY_DIR}/StartVS_${VS_BUILD_TYPE}.bat" )
+  endforeach()
+endif(WIN32)
+
 
