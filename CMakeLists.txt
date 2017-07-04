@@ -109,7 +109,7 @@ set(CMAKE_MODULE_PATH
 # the Superbuild, because VTK needs to know if we have Qt.
 ######################################################################
 
-set(DESIRED_QT_VERSION 4 CACHE STRING "Pick a version of Qt to use: 4 or 5")
+set(DESIRED_QT_VERSION 5 CACHE STRING "Pick a version of Qt to use: 4 or 5")
 
 if(DESIRED_QT_VERSION MATCHES 4)
   set(QT4_COMPONENTS QtCore QtGui)
