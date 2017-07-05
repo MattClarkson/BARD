@@ -82,6 +82,7 @@ if(NOT DEFINED VTK_DIR)
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
         ${EP_COMMON_ARGS}
+        -DCMAKE_PREFIX_PATH:PATH=${BARD_PREFIX_PATH}
         -DVTK_WRAP_TCL:BOOL=OFF
         -DVTK_WRAP_PYTHON:BOOL=OFF
         -DVTK_WRAP_JAVA:BOOL=OFF
@@ -97,7 +98,9 @@ if(NOT DEFINED VTK_DIR)
     DEPENDS ${proj_DEPENDENCIES}
   )
 
-  set(VTK_DIR ${proj_BUILD})
+  set(VTK_DIR ${proj_INSTALL})
+  set(BARD_PREFIX_PATH ${proj_INSTALL}^^${BARD_PREFIX_PATH})
+
   message("SuperBuild loading VTK from ${VTK_DIR}")
 
 else(NOT DEFINED VTK_DIR)
