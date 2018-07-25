@@ -34,7 +34,8 @@ int main(int argc, char** argv)
     TCLAP::ValueArg<std::string> intrinsicsArg("i","intrinsics","File containing (3x3) camera intrinsics then (1x4) distortion coefficients.",false,"","string");
     TCLAP::ValueArg<std::string> worldRefArg("w","world","File containing (nx4) points of a tracker board defining world coordinates.",true,"","string");
     TCLAP::ValueArg<std::string> pointerRefArg("p","pointer","File containing (nx4) points of a tracker board defining pointer coordinates.",false,"","string");
-    TCLAP::ValueArg<std::string> modelArg("m","model","vtkPolyData file a model to be rendered in the scene.",false,"","string");
+    TCLAP::ValueArg<std::string> modelArg0("m","model0","vtkPolyData file a model to be rendered in the scene.",false,"","string");
+    TCLAP::ValueArg<std::string> modelArg1("n", "model1", "vtkPolyData file a model to be rendered in the scene.", false, "", "string");
     TCLAP::ValueArg<std::string> outputDirArg("d", "directory", "Output directory to dump files.", false, "", "string");
     TCLAP::ValueArg<std::string> modelAlignArg("a", "align", "File containing (4x4) transform, to align models to world.", false, "", "string");
     TCLAP::ValueArg<float> imageOpacityArg("o","opacity","Image opacity.",false,0.5,"float");
@@ -48,7 +49,8 @@ int main(int argc, char** argv)
     cmd.add( intrinsicsArg );
     cmd.add( worldRefArg );
     cmd.add( pointerRefArg );
-    cmd.add( modelArg );
+    cmd.add( modelArg0 );
+    cmd.add( modelArg1 );
     cmd.add( outputDirArg );
     cmd.add( modelAlignArg );
     cmd.add( imageOpacityArg );
@@ -63,7 +65,8 @@ int main(int argc, char** argv)
     std::string intrinsicsFile = intrinsicsArg.getValue();
     std::string worldRef = worldRefArg.getValue();
     std::string pointerRef = pointerRefArg.getValue();
-    std::string modelFile = modelArg.getValue();
+    std::string modelFile0 = modelArg0.getValue();
+    std::string modelFile1 = modelArg1.getValue();
     std::string outputDir = outputDirArg.getValue();
     std::string modelAlignFile = modelAlignArg.getValue();
     float opacity = imageOpacityArg.getValue();
@@ -139,16 +142,23 @@ int main(int argc, char** argv)
     }
 
     // Add VTK files that enable us to visualise virtual objects in scene.
-    bard::VTKModelPipeline *modelForVisualisation = NULL;
-    if (modelFile.size() > 0)
+    bard::VTKModelPipeline *modelForVisualisation0 = NULL;
+    if (modelFile0.size() > 0)
     {
-      modelForVisualisation = new bard::VTKModelPipeline(modelFile);
-      myWidget.AddVTKModel(modelForVisualisation);
+      modelForVisualisation0 = new bard::VTKModelPipeline(modelFile0);
+      myWidget.AddVTKModel(modelForVisualisation0);
     }
-
+    bard::VTKModelPipeline *modelForVisualisation1 = NULL;
+    if (modelFile1.size() > 0)
+    {
+      modelForVisualisation1 = new bard::VTKModelPipeline(modelFile1);
+      myWidget.AddVTKModel(modelForVisualisation1);
+    }
     mainWin.setCentralWidget(&myWidget);
     mainWin.show();
     mainWin.raise();
+    mainWin.showMaximized();
+
 
     myWidget.GetInteractor()->Disable();
     myWidget.SetEnableImage(true);
@@ -162,9 +172,13 @@ int main(int argc, char** argv)
     {
       delete pointerTrackingModel;
     }
-    if (modelForVisualisation != NULL)
+    if (modelForVisualisation0 != NULL)
     {
-      delete modelForVisualisation;
+      delete modelForVisualisation0;
+    }
+    if (modelForVisualisation1 != NULL)
+    {
+      delete modelForVisualisation1;
     }
     return status;
   }
