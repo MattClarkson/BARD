@@ -1,7 +1,7 @@
 Basic Augmented Reality Demo (BARD)
 ===================================
 
-This project was built for the [MediCSS](http://www.medicss.cs.ucl.ac.uk/) summer school 2015.
+This project was built for the [MediCSS](http://www.medicss.cs.ucl.ac.uk/) summer school 2015-2017
 
 The aim was to demo some features of [VTK](http://www.vtk.org), [OpenCV](http://www.opencv.org) and [ArUco](http://www.uco.es/investiga/grupos/ava/node/26).
 
@@ -26,13 +26,27 @@ Features
 Build Instructions
 ------------------
 
-Currently tested on Mac OSX 10.10.4, using Xcode 6.1, Qt 4.8.7, CMake 3.1.2
+ 1. CMake version: 3.1+
+ 1. Qt version: Tested with 4.8.7 or 5.4.2. If you go much newer then Qt 5.4.2 you will probably have to build Qt to ensure it has QtWebkitWidgets
+ 1. Ensure qmake is on your PATH
+ 1. Install git bash from http://git-scm.com
 
+Currently tested on:
+ 1. Mac OSX 10.10.5, Qt 4.8.7, CMake 3.1.2, clang 600.0.57
+ 1. Windows, Qt 5.4.0, Visual Studio 2013.
+
+Notes:
+ 1. BUILD_SHARED_LIBS must be ON due to duplicate symbols in ArUco.
+ 1. Supervisor should explain the SuperBuild (a.k.a MetaBuild) and BARD-build folder structure.
+ 1. On Windows, StartVS_Debug.bat / StartVS_Release.bat in build folder should be used to launch Visual Studio.
+ 1. On Linux and Mac, once compiled, you will probably have to set LD_LIBRARY_PATH or DYLD_LIBRARY_PATH (Mac) to find libraries such as ArUco, VTK, OpenCV and Qt.
+  
 ```
 git clone https://github.com/MattClarkson/BARD.git
 mkdir BARD-SuperBuild-Debug
 cd BARD-SuperBuild-Debug
 ccmake ../BARD
+(set some options, most likely for Qt)
 make
 ```
 

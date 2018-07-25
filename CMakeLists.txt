@@ -92,6 +92,10 @@ endif()
 option(BUILD_SHARED_LIBS "Build BARD with shared libraries." ON)
 set(BARD_EP_TARBALL_LOCATION "http://cmic.cs.ucl.ac.uk/platform/dependencies")
 
+if (NOT BUILD_SHARED_LIBS)
+  message(FATAL_ERROR "This project must be built with BUILD_SHARED_LIBS=ON due to bug in ArUco.")
+endif()
+
 
 ######################################################################
 # Setup the path to load CMake macros, and extra CMake files.
@@ -105,18 +109,79 @@ set(CMAKE_MODULE_PATH
 
 
 ######################################################################
+# Make sure Git is available.
+######################################################################
+find_package(Git REQUIRED)
+if (WIN32)
+  set(GITCOMMAND ${GIT_EXECUTABLE})
+endif()
+
+
+######################################################################
+# This is for setting up runtime VS environment.
+######################################################################
+set(ADDITIONAL_SEARCH_PATHS)
+
+######################################################################
 # Find Qt. We need to check for Qt first, before we go ahead and do
 # the Superbuild, because VTK needs to know if we have Qt.
 ######################################################################
+set(DESIRED_QT_VERSION 5 CACHE STRING "Pick a version of Qt to use: 4 or 5")
 
-set(DESIRED_QT_VERSION 4 CACHE STRING "Pick a version of Qt to use: 4 or 5")
+if(DESIRED_QT_VERSION MATCHES 4)
+  set(QT4_COMPONENTS QtCore QtGui)
+  find_package(Qt4 COMPONENTS ${QT4_COMPONENTS} REQUIRED)
+  if(QT_FOUND)
+    set(QT_USE_QTTEST 1)
+    set(QT_USE_QTXML 1)
+    set(QT_USE_QTXMLPATTERNS 1)
+    set(QT_USE_PHONON 0)
+    include(${QT_USE_FILE})
+  endif()
+endif()
+if(DESIRED_QT_VERSION MATCHES 5)
+  set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" CACHE PATH "")
+  set(QT5_COMPONENTS Core Gui Widgets WebKitWidgets)
+  find_package(Qt5 COMPONENTS ${QT5_COMPONENTS} REQUIRED)
+  if(Qt5_DIR)
+    get_filename_component(_Qt5_DIR "${Qt5_DIR}/../../../" ABSOLUTE)
+    list(FIND CMAKE_PREFIX_PATH "${_Qt5_DIR}" _result)
+    if(_result LESS 0)
+      set(CMAKE_PREFIX_PATH "${_Qt5_DIR};${CMAKE_PREFIX_PATH}" CACHE PATH "" FORCE)
+    endif()
+    set(BARD_PREFIX_PATH ${_Qt5_DIR})
+  endif()
+endif()
 
-# We ALWAYS need Qt. This is because MITK always needs it.
-find_package(Qt4 COMPONENTS QtCore QtGui QtXml QtNetwork REQUIRED)
-set(QT_USE_QTXML 1)
-set(QT_USE_QTXMLPATTERNS 1)
-set(QT_USE_PHONON 0)
-include(${QT_USE_FILE})
+# Determine the Qt4/5 library installation prefix
+set(_qmake_location )
+if(DESIRED_QT_VERSION MATCHES 4)
+  set(_qmake_location ${QT_QMAKE_EXECUTABLE})
+elseif(DESIRED_QT_VERSION MATCHES 5 AND TARGET ${Qt5Core_QMAKE_EXECUTABLE})
+  get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE}
+               PROPERTY IMPORT_LOCATION)
+endif()
+if(_qmake_location)
+  if(NOT _qt_install_libs)
+    if(WIN32)
+      execute_process(COMMAND ${_qmake_location} -query QT_INSTALL_BINS
+                      OUTPUT_VARIABLE _qt_install_libs
+                      OUTPUT_STRIP_TRAILING_WHITESPACE)
+    else()
+      execute_process(COMMAND ${_qmake_location} -query QT_INSTALL_LIBS
+                      OUTPUT_VARIABLE _qt_install_libs
+                      OUTPUT_STRIP_TRAILING_WHITESPACE)
+    endif()
+    file(TO_CMAKE_PATH "${_qt_install_libs}" _qt_install_libs)
+    set(_qt_install_libs ${_qt_install_libs} CACHE INTERNAL "Qt library installation prefix" FORCE)
+  endif()
+  if(_qt_install_libs)
+    list(APPEND ADDITIONAL_SEARCH_PATHS ${_qt_install_libs})
+  endif()
+elseif(MITK_USE_QT)
+  message(WARNING "The qmake executable could not be found.")
+endif()
+
 if(BUILD_SUPERBUILD)
   set(VTK_QT_ARGS
     -DVTK_QT_VERSION:STRING=${DESIRED_QT_VERSION}
@@ -125,7 +190,7 @@ if(BUILD_SUPERBUILD)
     -DVTK_USE_QT:BOOL=ON
     -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
   )
-endif(BUILD_SUPERBUILD)
+endif()
 
  
 ######################################################################
@@ -167,21 +232,81 @@ set(CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
    )
 
+
+######################################################################
+# Force MSVC runtime. Depends on BUILD_SHARED_LIBS
+######################################################################
+if(MSVC)
+  set(variables
+    CMAKE_C_FLAGS_DEBUG
+    CMAKE_C_FLAGS_MINSIZEREL
+    CMAKE_C_FLAGS_RELEASE
+    CMAKE_C_FLAGS_RELWITHDEBINFO
+    CMAKE_CXX_FLAGS_DEBUG
+    CMAKE_CXX_FLAGS_MINSIZEREL
+    CMAKE_CXX_FLAGS_RELEASE
+    CMAKE_CXX_FLAGS_RELWITHDEBINFO
+  )
+  if(BUILD_SHARED_LIBS)
+    message(STATUS "Forcing MSVC to use dynamic runtime variables.")
+    foreach(variable ${variables})
+      if(${variable} MATCHES "/MT")
+        string(REGEX REPLACE "/MT" "/MD" ${variable} "${${variable}}")
+      endif()
+    endforeach()
+  else()
+    message(STATUS "Forcing MSVC to use static runtime variables.")
+    foreach(variable ${variables})
+      if(${variable} MATCHES "/MD")
+        string(REGEX REPLACE "/MD" "/MT" ${variable} "${${variable}}")
+      endif()
+    endforeach()
+  endif()
+  message(STATUS "Initial build flags:")
+  foreach(variable ${variables})
+    message(STATUS "  '${variable}': ${${variable}}")
+  endforeach()
+  message(STATUS "")
+endif()
+
+
 ######################################################################
 # Find Mandatory External packages
 ######################################################################
 
 find_package(VTK REQUIRED)
 include(${VTK_USE_FILE})
+list(APPEND ADDITIONAL_SEARCH_PATHS "${VTK_INSTALL_PREFIX}/lib")
 
 set(OpenCV_FIND_QUIETLY ON)
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
+add_definitions(-DBUILD_OpenCV)
+if(WIN32)
+  list(APPEND ADDITIONAL_SEARCH_PATHS ${OpenCV_LIB_PATH})
+else()
+  list(APPEND ADDITIONAL_SEARCH_PATHS "${OpenCV_INSTALL_PATH}/lib")
+endif()
 
 find_package(aruco REQUIRED)
+list(APPEND ADDITIONAL_SEARCH_PATHS ${aruco_LIB_DIR})
 
 set(ALL_LIBS)
 list(APPEND ALL_LIBS ${aruco_LIBS} ${OpenCV_LIBS} ${VTK_LIBRARIES})
+
+set(ADDITIONAL_BIN_DIRS)
+#if(WIN32)
+  foreach (_dir ${ADDITIONAL_SEARCH_PATHS})
+    get_filename_component(_up_dir ${_dir} PATH)
+    if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_LESS 2.8)
+      get_filename_component(_abs_dir ${_up_dir} ABSOLUTE)
+    else()
+      get_filename_component(_abs_dir ${_up_dir} REALPATH)
+    endif()
+    list(APPEND ADDITIONAL_BIN_DIRS "${_abs_dir}/bin")
+  endforeach()
+##endif()
+
 
 ######################################################################
 # Output directories, for when compiling, not installing.
@@ -230,4 +355,18 @@ include_directories(
 ######################################################################
 
 add_subdirectory(Code)
+
+######################################################################
+# If we are under Windows, create batch files which correctly
+# set up the environment for Visual Studio. These are only used to
+# start VS when developing. Not used in the final installation package.
+######################################################################
+if(WIN32)
+  set(VS_SOLUTION_FILE "${PROJECT_BINARY_DIR}/${PROJECT_NAME}.sln")
+  foreach(VS_BUILD_TYPE ${CMAKE_CONFIGURATION_TYPES})
+    configure_file("${CMAKE_SOURCE_DIR}/CMake/StartVS.bat.in" ${PROJECT_BINARY_DIR}/StartVS_${VS_BUILD_TYPE}.bat @ONLY)
+    message( "CreateWindowsBatchScript: Creating ${PROJECT_BINARY_DIR}/StartVS_${VS_BUILD_TYPE}.bat" )
+  endforeach()
+endif(WIN32)
+
 
