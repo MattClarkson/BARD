@@ -48,6 +48,7 @@ public:
 
   vtkSetMacro(UseCalibratedCamera, bool);
   vtkGetMacro(UseCalibratedCamera, bool);
+  vtkSetMacro(WriteCameraPosition, bool);
 
   /**
    * \brief Set the size of the image in pixels that was used while calibrating the camera model.
@@ -91,6 +92,7 @@ private:
 
   vtkSmartPointer<vtkMatrix4x4> m_IntrinsicMatrix;
   bool UseCalibratedCamera;
+  bool WriteCameraPosition; // if true the camera position is written to std::out on update
   int m_ImageWidthInPixels;
   int m_ImageHeightInPixels;
   int m_WindowWidthInPixels;
