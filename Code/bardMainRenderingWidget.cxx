@@ -669,7 +669,7 @@ void MainRenderingWidget::keyPressEvent(QKeyEvent * event)
 void MainRenderingWidget::mousePressEvent(QMouseEvent * event)
 {
   int rightScreen = this->GetRenderWindow()->GetSize()[0] * 0.8;
-  int leftScreen = this->GetRenderWindow()->GetSize()[0] * 0.5;
+  int leftScreen = this->GetRenderWindow()->GetSize()[0] * 0.1;
   int upperScreen = this->GetRenderWindow()->GetSize()[1] * 0.67;
   int lowerScreen = this->GetRenderWindow()->GetSize()[1] * 0.33;
 
