@@ -41,7 +41,7 @@ int main(int argc, char** argv)
     TCLAP::ValueArg<float> imageOpacityArg("o","opacity","Image opacity.",false,0.5,"float");
     TCLAP::ValueArg<int> imageXSizeArg("x","xsize","xsize when calibrating.",true,1,"int");
     TCLAP::ValueArg<int> imageYSizeArg("y","ysize","ysize when calibrating.",true,1,"int");
-    TCLAP::ValueArg<int> openCVSourceIndex("i", "index", "Camera Index to use", false, 0, "int");
+    TCLAP::ValueArg<int> openCVSourceIndex("k", "index", "Camera Index to use", false, 0, "int");
     TCLAP::SwitchArg doDistortionArg("c","correct","Do distortion correction.", false);
     TCLAP::SwitchArg flipSwitchArg("f","flip","Flip in Y-axis.", false);
     TCLAP::SwitchArg pointerRecordMatrixArg("r","record","Record pointer matrix (e.g. for pivot calib).", false);
