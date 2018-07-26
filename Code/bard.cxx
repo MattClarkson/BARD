@@ -34,13 +34,13 @@ int main(int argc, char** argv)
     TCLAP::ValueArg<std::string> intrinsicsArg("i","intrinsics","File containing (3x3) camera intrinsics then (1x4) distortion coefficients.",false,"","string");
     TCLAP::ValueArg<std::string> worldRefArg("w","world","File containing (nx4) points of a tracker board defining world coordinates.",true,"","string");
     TCLAP::ValueArg<std::string> pointerRefArg("p","pointer","File containing (nx4) points of a tracker board defining pointer coordinates.",false,"","string");
-    TCLAP::ValueArg<std::string> modelArg("m","model","vtkPolyData file a model to be rendered in the scene.",false,"","string");
+    TCLAP::MultiArg<std::string> modelArg("m", "model", "vtkPolyData file a model to be rendered in the scene, can be repeated for multiple models.", false, "string");
     TCLAP::ValueArg<std::string> outputDirArg("d", "directory", "Output directory to dump files.", false, "", "string");
     TCLAP::ValueArg<std::string> modelAlignArg("a", "align", "File containing (4x4) transform, to align models to world.", false, "", "string");
     TCLAP::ValueArg<float> imageOpacityArg("o","opacity","Image opacity.",false,0.5,"float");
     TCLAP::ValueArg<int> imageXSizeArg("x","xsize","xsize when calibrating.",true,1,"int");
     TCLAP::ValueArg<int> imageYSizeArg("y","ysize","ysize when calibrating.",true,1,"int");
-    TCLAP::ValueArg<int> openCVSourceIndex("i", "index", "Camera Index to use", false, 0, "int");
+    TCLAP::ValueArg<int> openCVSourceIndex("k", "index", "Camera Index to use", false, 0, "int");
     TCLAP::SwitchArg doDistortionArg("c","correct","Do distortion correction.", false);
     TCLAP::SwitchArg flipSwitchArg("f","flip","Flip in Y-axis.", false);
     TCLAP::SwitchArg pointerRecordMatrixArg("r","record","Record pointer matrix (e.g. for pivot calib).", false);
@@ -63,7 +63,7 @@ int main(int argc, char** argv)
     std::string intrinsicsFile = intrinsicsArg.getValue();
     std::string worldRef = worldRefArg.getValue();
     std::string pointerRef = pointerRefArg.getValue();
-    std::string modelFile = modelArg.getValue();
+    std::vector <std::string> modelFile = modelArg.getValue();
     std::string outputDir = outputDirArg.getValue();
     std::string modelAlignFile = modelAlignArg.getValue();
     float opacity = imageOpacityArg.getValue();
@@ -139,16 +139,18 @@ int main(int argc, char** argv)
     }
 
     // Add VTK files that enable us to visualise virtual objects in scene.
-    bard::VTKModelPipeline *modelForVisualisation = NULL;
-    if (modelFile.size() > 0)
+    std::vector <bard::VTKModelPipeline*> modelsForVisualisation;
+    for ( std::vector<std::string>::iterator it = modelFile.begin() ; it < modelFile.end() ; ++it )
     {
-      modelForVisualisation = new bard::VTKModelPipeline(modelFile);
+      bard::VTKModelPipeline* modelForVisualisation = new bard::VTKModelPipeline(*it);
+      modelsForVisualisation.push_back(modelForVisualisation);
       myWidget.AddVTKModel(modelForVisualisation);
     }
-
     mainWin.setCentralWidget(&myWidget);
     mainWin.show();
     mainWin.raise();
+    mainWin.showMaximized();
+
 
     myWidget.GetInteractor()->Disable();
     myWidget.SetEnableImage(true);
@@ -162,9 +164,10 @@ int main(int argc, char** argv)
     {
       delete pointerTrackingModel;
     }
-    if (modelForVisualisation != NULL)
+
+    for ( std::vector<bard::VTKModelPipeline*>::iterator it = modelsForVisualisation.begin(); it < modelsForVisualisation.end() ; ++it )
     {
-      delete modelForVisualisation;
+      delete *it;
     }
     return status;
   }

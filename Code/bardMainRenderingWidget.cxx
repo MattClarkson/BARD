@@ -19,6 +19,7 @@
 #include <vtkImageData.h>
 #include <vtkRendererCollection.h>
 #include <vtkPNGWriter.h>
+#include <vtkProperty.h>
 #include <sstream>
 #include <ostream>
 #include <QKeyEvent>
@@ -304,6 +305,11 @@ bool MainRenderingWidget::GetTrackingModelsAreEnabled() const
 void MainRenderingWidget::AddVTKModel(bard::VTKModelInterface* model)
 {
   m_VTKModels.push_back(model);
+  if (m_VTKModels.size() > 1)
+  {
+    m_VTKModels[1]->GetActor()->GetProperty()->SetColor(0.0, 0.0, 1.0);
+    m_VTKModels[0]->GetActor()->GetProperty()->SetColor(0.52, 0.03, 0.57);
+  }
 }
 
 
@@ -659,6 +665,35 @@ void MainRenderingWidget::keyPressEvent(QKeyEvent * event)
       }
     } // end if D or S.
   } // end if event not null.
+}
+void MainRenderingWidget::mousePressEvent(QMouseEvent * event)
+{
+  int rightScreen = this->GetRenderWindow()->GetSize()[0] * 0.8;
+  int leftScreen = this->GetRenderWindow()->GetSize()[0] * 0.1;
+  int upperScreen = this->GetRenderWindow()->GetSize()[1] * 0.67;
+  int lowerScreen = this->GetRenderWindow()->GetSize()[1] * 0.33;
+
+  if (event->x() > rightScreen)
+  {
+    if (event->y() > upperScreen)
+    {
+      m_ImageActor->SetOpacity(m_ImageActor->GetOpacity() + 0.1);
+    }
+    if (event->y() < lowerScreen)
+    {
+      m_ImageActor->SetOpacity(m_ImageActor->GetOpacity() - 0.1);
+    }
+  }
+
+  if ( event->x() < leftScreen )
+  {
+    if (m_VTKModels.size() > 0)
+    {
+      int visible = m_VTKModels[0]->GetActor()->GetVisibility();
+
+      m_VTKModels[0]->GetActor()->SetVisibility(std::abs(visible - 1));
+    }
+  }
 }
 
 } // end namespace

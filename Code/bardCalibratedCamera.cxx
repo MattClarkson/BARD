@@ -34,6 +34,7 @@ vtkStandardNewMacro(CalibratedCamera);
 CalibratedCamera::CalibratedCamera()
 : m_IntrinsicMatrix(NULL)
 , UseCalibratedCamera(false)
+, WriteCameraPosition(false)
 , m_ImageWidthInPixels(256)
 , m_ImageHeightInPixels(256)
 , m_WindowWidthInPixels(256)
@@ -101,8 +102,10 @@ void CalibratedCamera::SetExtrinsicParameters(vtkSmartPointer<vtkMatrix4x4> matr
   this->SetFocalPoint(focalPoint[0], focalPoint[1], focalPoint[2]);
   this->SetViewUp(viewUp[0], viewUp[1], viewUp[2]);
   this->SetClippingRange(1, 5000);
-
-  std::cout << "Camera position = " << origin[0] << ", " << origin[1] << ", " << origin[2] << std::endl;
+  if (this->WriteCameraPosition)
+  {
+	std::cout << "Camera position = " << origin[0] << ", " << origin[1] << ", " << origin[2] << std::endl;
+  }
   this->Modified();
 }
 

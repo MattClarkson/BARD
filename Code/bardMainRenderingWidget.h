@@ -73,6 +73,7 @@ public:
   vtkSmartPointer<vtkMatrix4x4> GetWorldToCameraTransform() const;
 
   virtual void keyPressEvent(QKeyEvent * event);
+  virtual void mousePressEvent(QMouseEvent * event);
 
 private slots:
 
