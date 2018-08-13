@@ -26,9 +26,12 @@ int main(int argc, char** argv)
   {
     TCLAP::CmdLine cmd("Basic Augmented Reality Demo - Frame Grabber", ' ', "0.1");
     TCLAP::ValueArg<std::string> outputDirArg("d", "directory", "Output directory to dump files.", false, "", "string");
+    TCLAP::ValueArg<int> openCVSourceIndex("i", "index", "Camera Index to use", false, 0, "int");
     cmd.add( outputDirArg );
+    cmd.add( openCVSourceIndex );
     cmd.parse( argc, argv );
     std::string outputDir = outputDirArg.getValue();
+    int sourceIndex = openCVSourceIndex.getValue();
 
     QApplication app(argc, argv);
     app.setOrganizationName("CMIC");
@@ -36,7 +39,7 @@ int main(int argc, char** argv)
 
     bard::MainWindow mainWin;
 
-    bard::OpenCVVideoSource mySource("");
+    bard::OpenCVVideoSource mySource(sourceIndex);
 
     bard::MainRenderingWidget myWidget;
     myWidget.SetVideoSource(&mySource);

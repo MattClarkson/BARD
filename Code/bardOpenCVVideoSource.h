@@ -32,6 +32,7 @@ class OpenCVVideoSource : public VideoSourceInterface {
 public:
 
   OpenCVVideoSource(const std::string& fileName);
+  OpenCVVideoSource(const int& index);
   virtual ~OpenCVVideoSource();
 
   virtual unsigned int GetWidth();
